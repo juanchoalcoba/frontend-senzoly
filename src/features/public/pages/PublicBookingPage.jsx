@@ -1,0 +1,433 @@
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { getTenantBySlug, getAvailableSlots, createPublicBooking } from '../services/publicApi';
+import { 
+  Scissors, Clock, DollarSign, Calendar, User, Mail, Phone, 
+  ChevronRight, ChevronLeft, CheckCircle2, XCircle, Loader2, MapPin, FileText
+} from 'lucide-react';
+
+const STEPS = ['Servicio', 'Fecha y Hora', 'Tus Datos', 'Confirmación'];
+
+export default function PublicBookingPage() {
+  const { slug } = useParams();
+
+  const [tenantData, setTenantData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [step, setStep] = useState(0);
+  const [selectedService, setSelectedService] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedSlot, setSelectedSlot] = useState('');
+  const [slots, setSlots] = useState([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+
+  const [customerForm, setCustomerForm] = useState({
+    firstName: '', lastName: '', email: '', phone: '', notes: ''
+  });
+  const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmation, setConfirmation] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getTenantBySlug(slug);
+        setTenantData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [slug]);
+
+  useEffect(() => {
+    if (selectedService && selectedDate) {
+      const fetchSlots = async () => {
+        setSlotsLoading(true);
+        setSlots([]);
+        setSelectedSlot('');
+        try {
+          const data = await getAvailableSlots(slug, selectedService.id, selectedDate);
+          setSlots(data);
+        } catch (err) {
+          setSlots([]);
+        } finally {
+          setSlotsLoading(false);
+        }
+      };
+      fetchSlots();
+    }
+  }, [selectedService, selectedDate]);
+
+  const getTodayStr = () => {
+    const d = new Date();
+    return d.toISOString().split('T')[0];
+  };
+
+  const formatPrice = (val) => {
+    const num = parseFloat(val) || 0;
+    return new Intl.NumberFormat('es-UY', { style: 'currency', currency: 'UYU', maximumFractionDigits: 0 }).format(num);
+  };
+
+  const handleSubmit = async () => {
+    setFormError('');
+    const { firstName, lastName, email, phone } = customerForm;
+    if (!firstName.trim() || !lastName.trim()) {
+      setFormError('El nombre y apellido son obligatorios.');
+      return;
+    }
+    if (!email.trim() && !phone.trim()) {
+      setFormError('Debes indicar al menos un método de contacto (email o teléfono).');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const result = await createPublicBooking(slug, {
+        serviceId: selectedService.id,
+        bookingDate: selectedDate,
+        startTime: selectedSlot,
+        customer: customerForm,
+        notes: customerForm.notes,
+      });
+      setConfirmation(result);
+      setStep(3);
+    } catch (err) {
+      setFormError(err.message || 'Error al confirmar la reserva.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 flex items-center justify-center">
+        <div className="text-center space-y-3 text-white">
+          <Loader2 className="w-10 h-10 animate-spin mx-auto text-orange-400" />
+          <p className="text-sm text-slate-400">Cargando información del negocio...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !tenantData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 flex items-center justify-center p-6">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center space-y-4 max-w-sm">
+          <XCircle className="w-12 h-12 text-red-400 mx-auto" />
+          <h2 className="text-white font-bold text-xl">Negocio no encontrado</h2>
+          <p className="text-slate-400 text-sm">El enlace de reserva que seguiste no existe o no está activo.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { tenant, services } = tenantData;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 font-sans">
+      
+      {/* Header del Negocio */}
+      <header className="border-b border-white/10 px-6 py-5">
+        <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex-1">
+            <h1 className="text-white font-black text-2xl tracking-tight">{tenant.name}</h1>
+            <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-slate-400">
+              {tenant.address && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-orange-500" /> {tenant.address}
+                </span>
+              )}
+              {tenant.phone && (
+                <span className="flex items-center gap-1">
+                  <Phone className="w-3.5 h-3.5 text-orange-500" /> {tenant.phone}
+                </span>
+              )}
+            </div>
+            {tenant.description && (
+              <p className="text-slate-400 text-xs mt-1.5 max-w-md">{tenant.description}</p>
+            )}
+          </div>
+          <div className="shrink-0">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500/20 text-orange-300 text-xs font-semibold rounded-full border border-orange-500/30">
+              <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse"></div>
+              Reserva Online
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* Stepper */}
+      {step < 3 && (
+        <div className="max-w-2xl mx-auto px-6 pt-8">
+          <div className="flex items-center gap-1">
+            {STEPS.slice(0, 3).map((s, i) => (
+              <React.Fragment key={i}>
+                <div className={`flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-full transition-all ${
+                  step === i ? 'bg-orange-500 text-white' : step > i ? 'bg-orange-500/20 text-orange-400' : 'text-slate-600'
+                }`}>
+                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    step > i ? 'bg-orange-500 text-white' : step === i ? 'bg-white text-orange-600' : 'bg-slate-700 text-slate-400'
+                  }`}>{step > i ? '✓' : i + 1}</span>
+                  <span className="hidden sm:inline">{s}</span>
+                </div>
+                {i < 2 && <div className={`flex-1 h-px ${step > i ? 'bg-orange-500/60' : 'bg-slate-700'}`}></div>}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Content Area */}
+      <main className="max-w-2xl mx-auto px-6 py-8 space-y-5">
+
+        {/* PASO 0: SELECCIÓN DE SERVICIO */}
+        {step === 0 && (
+          <div className="space-y-4">
+            <h2 className="text-white font-bold text-xl">¿Qué servicio deseas agendar?</h2>
+            {services.length === 0 ? (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-slate-400">
+                <Scissors className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+                <p>El negocio no tiene servicios activos en este momento.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {services.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => { setSelectedService(s); setStep(1); }}
+                    className={`w-full text-left bg-white/5 border ${
+                      selectedService?.id === s.id ? 'border-orange-500 bg-orange-500/10' : 'border-white/10 hover:border-white/25'
+                    } rounded-2xl p-4 transition-all`}
+                  >
+                    <p className="text-white font-bold text-base">{s.name}</p>
+                    {s.description && <p className="text-slate-400 text-xs mt-1 line-clamp-2">{s.description}</p>}
+                    <div className="flex items-center gap-3 mt-3 text-xs">
+                      <span className="flex items-center gap-1.5 text-slate-400">
+                        <Clock className="w-3.5 h-3.5 text-orange-400" /> {s.duration_minutes} min
+                      </span>
+                      <span className="flex items-center gap-1.5 font-bold text-orange-300">
+                        <DollarSign className="w-3.5 h-3.5" /> {formatPrice(s.price)}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PASO 1: FECHA Y HORA */}
+        {step === 1 && selectedService && (
+          <div className="space-y-5">
+            {/* Selected service summary */}
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-center justify-between">
+              <div>
+                <p className="text-orange-300 text-xs font-semibold uppercase tracking-wide">Servicio seleccionado</p>
+                <p className="text-white font-bold">{selectedService.name}</p>
+                <p className="text-slate-400 text-xs">{selectedService.duration_minutes} min · {formatPrice(selectedService.price)}</p>
+              </div>
+              <button onClick={() => setStep(0)} className="text-slate-400 hover:text-white text-xs flex items-center gap-1">
+                <ChevronLeft className="w-4 h-4" /> Cambiar
+              </button>
+            </div>
+
+            <div>
+              <h2 className="text-white font-bold text-xl mb-4">Selecciona una fecha</h2>
+              <input
+                type="date"
+                min={getTodayStr()}
+                value={selectedDate}
+                onChange={(e) => { setSelectedDate(e.target.value); setSelectedSlot(''); }}
+                className="w-full bg-white/5 border border-white/20 text-white rounded-xl px-4 py-3 text-sm focus:border-orange-500 focus:outline-none"
+              />
+            </div>
+
+            {selectedDate && (
+              <div>
+                <h2 className="text-white font-bold text-base mb-3">Horarios Disponibles</h2>
+                {slotsLoading ? (
+                  <div className="text-slate-400 flex items-center gap-2 text-sm">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Calculando franjas disponibles...
+                  </div>
+                ) : slots.length === 0 ? (
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center text-slate-500 text-sm">
+                    No hay horarios disponibles para esta fecha.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                    {slots.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSlot(s)}
+                        className={`py-2 rounded-lg text-sm font-semibold transition-all ${
+                          selectedSlot === s
+                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                            : 'bg-white/5 text-slate-300 border border-white/10 hover:border-orange-400/40 hover:bg-orange-500/10'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setStep(2)}
+                disabled={!selectedDate || !selectedSlot}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm disabled:opacity-40 transition-all"
+              >
+                Continuar <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 2: DATOS DEL CLIENTE */}
+        {step === 2 && (
+          <div className="space-y-5">
+            {/* Summary bar */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-wrap gap-3 text-xs text-slate-400">
+              <span className="flex items-center gap-1"><Scissors className="w-3.5 h-3.5 text-orange-500" /> {selectedService.name}</span>
+              <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-orange-500" /> {selectedDate}</span>
+              <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-orange-500" /> {selectedSlot}</span>
+            </div>
+
+            <h2 className="text-white font-bold text-xl">Ingresa tus datos de contacto</h2>
+
+            {formError && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl p-4 text-sm flex items-center gap-2">
+                <XCircle className="w-4 h-4 shrink-0" /> {formError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 font-semibold mb-1">Nombre *</label>
+                  <input
+                    type="text" required
+                    placeholder="Juan"
+                    value={customerForm.firstName}
+                    onChange={(e) => setCustomerForm({ ...customerForm, firstName: e.target.value })}
+                    className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none placeholder:text-slate-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 font-semibold mb-1">Apellido *</label>
+                  <input
+                    type="text" required
+                    placeholder="García"
+                    value={customerForm.lastName}
+                    onChange={(e) => setCustomerForm({ ...customerForm, lastName: e.target.value })}
+                    className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none placeholder:text-slate-600"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 font-semibold mb-1">Correo Electrónico</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <input
+                    type="email"
+                    placeholder="ejemplo@correo.com"
+                    value={customerForm.email}
+                    onChange={(e) => setCustomerForm({ ...customerForm, email: e.target.value })}
+                    className="w-full pl-9 bg-white/5 border border-white/15 text-white rounded-xl px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none placeholder:text-slate-600"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 font-semibold mb-1">Teléfono</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <input
+                    type="text"
+                    placeholder="+598 99 000 000"
+                    value={customerForm.phone}
+                    onChange={(e) => setCustomerForm({ ...customerForm, phone: e.target.value })}
+                    className="w-full pl-9 bg-white/5 border border-white/15 text-white rounded-xl px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none placeholder:text-slate-600"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-400 font-semibold mb-1">Notas o indicaciones (opcional)</label>
+                <textarea
+                  rows={3}
+                  placeholder="¿Alguna preferencia o indicación para el servicio?"
+                  value={customerForm.notes}
+                  onChange={(e) => setCustomerForm({ ...customerForm, notes: e.target.value })}
+                  className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3 py-2.5 text-sm focus:border-orange-500 focus:outline-none resize-none placeholder:text-slate-600"
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="flex justify-between">
+              <button onClick={() => setStep(1)} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-all">
+                <ChevronLeft className="w-4 h-4" /> Volver
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm disabled:opacity-50 transition-all"
+              >
+                {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Confirmando...</> : <>Confirmar Reserva <CheckCircle2 className="w-4 h-4" /></>}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 3: CONFIRMACIÓN */}
+        {step === 3 && confirmation && (
+          <div className="text-center space-y-6 py-8">
+            <div className="w-20 h-20 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+            </div>
+            <div>
+              <h2 className="text-white font-black text-2xl">¡Reserva Confirmada!</h2>
+              <p className="text-slate-400 text-sm mt-2">
+                Te esperamos, {confirmation.customer.first_name}. Aquí tienes el resumen de tu cita:
+              </p>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-left space-y-4 max-w-sm mx-auto">
+              <div className="flex items-center gap-3 text-sm">
+                <Scissors className="w-4 h-4 text-orange-400 shrink-0" />
+                <div>
+                  <p className="text-slate-400 text-xs">Servicio</p>
+                  <p className="text-white font-semibold">{confirmation.service.name}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Calendar className="w-4 h-4 text-orange-400 shrink-0" />
+                <div>
+                  <p className="text-slate-400 text-xs">Fecha y Hora</p>
+                  <p className="text-white font-semibold">{confirmation.booking.booking_date} — {confirmation.booking.start_time?.substring(0,5)}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <DollarSign className="w-4 h-4 text-orange-400 shrink-0" />
+                <div>
+                  <p className="text-slate-400 text-xs">Total a Abonar</p>
+                  <p className="text-white font-semibold">{formatPrice(confirmation.booking.total_price)}</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-slate-500 text-xs">
+              Ante cualquier cambio, comunícate con <strong className="text-slate-300">{tenant.name}</strong>
+              {tenant.phone && <> al <strong className="text-slate-300">{tenant.phone}</strong></>}.
+            </p>
+          </div>
+        )}
+
+      </main>
+    </div>
+  );
+}
