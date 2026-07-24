@@ -42,7 +42,7 @@ export default function Hero() {
                   <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white">
                     <span className="text-base">🚀</span>
                     <span
-                      className="text-sm font-semibold"
+                      className="text-xs font-semibold"
                       style={{
                         background: "linear-gradient(90deg, #FF6B00, #a855f7)",
                         WebkitBackgroundClip: "text",
