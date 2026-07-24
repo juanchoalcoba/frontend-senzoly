@@ -105,14 +105,14 @@ export default function Hero() {
               </div>
 
 {/* Redes Sociales */}
-<div className="mt-10 flex justify-center lg:justify-start gap-4">
+<div className="mt-8 flex justify-center lg:justify-start gap-4">
   {/* Instagram */}
   <a
     href="https://www.instagram.com/senzoly"
     target="_blank"
     rel="noopener noreferrer"
     aria-label="Instagram"
-    className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+    className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
   >
     <FaInstagram size={22} />
   </a>
@@ -123,7 +123,7 @@ export default function Hero() {
     target="_blank"
     rel="noopener noreferrer"
     aria-label="WhatsApp"
-    className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+    className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
   >
     <FaWhatsapp size={22} />
   </a>
@@ -134,7 +134,7 @@ export default function Hero() {
     target="_blank"
     rel="noopener noreferrer"
     aria-label="LinkedIn"
-    className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+    className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
   >
     <FaLinkedinIn size={20} />
   </a>
