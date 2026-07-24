@@ -5,6 +5,7 @@ import {
   FaWhatsapp,
   FaLinkedinIn,
 } from "react-icons/fa";
+import { HiOutlineCalendarDays } from "react-icons/hi2";
 
 export default function Hero() {
   return (
@@ -35,33 +36,28 @@ export default function Hero() {
                 />
               </div>
 
-              {/* Badge premium con borde gradiente animado */}
-              <div className="inline-flex mb-6">
-                <div
-                  className="badge-gradient-border p-[1.5px] rounded-full"
-                  style={{
-                    boxShadow:
-                      "0 0 18px 2px rgba(168,85,247,0.18), 0 0 8px 1px rgba(255,107,0,0.13)",
-                  }}
-                >
-                  <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white">
-                    <span className="text-base">🚀</span>
-                    <span
-                      className="text-xs font-semibold"
-                      style={{
-                        background: "linear-gradient(90deg, #FF6B00, #a855f7)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                      }}
-                    >
-                      Software de reservas para negocios inteligentes
-                    </span>
-                  </div>
-                </div>
-              </div>
+              {/* Badge */}
+<div className="flex justify-center lg:justify-start mb-6">
+  <div className="inline-flex items-center gap-3 rounded-full border border-orange-200 bg-white px-5 py-2 shadow-sm">
+    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50">
+      <HiOutlineCalendarDays className="h-4 w-4 text-[#FF6B00]" />
+    </div>
 
-              <h1 className="text-5xl text-center md:text-left tracking-tight font-bold  text-slate-900 sm:text-6xl md:text-6xl lg:text-6xl xl:text-5xl mb-6 leading-16">
+    <span
+      className="text-sm font-semibold"
+      style={{
+        background: "linear-gradient(90deg, #FF6B00, #a855f7)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}
+    >
+      Reservas para negocios inteligentes
+    </span>
+  </div>
+</div>
+
+              <h1 className="text-4xl text-center md:text-left tracking-tight font-bold  text-slate-900 sm:text-6xl md:text-6xl lg:text-6xl xl:text-5xl mb-6 lg:leading-16">
                 Reservas simples, <br className="hidden md:block" />
                 <span className="text-[#FF6B00]">negocios que crecen</span>
               </h1>
