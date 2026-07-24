@@ -1,5 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import {
+  FaInstagram,
+  FaWhatsapp,
+  FaLinkedinIn,
+} from "react-icons/fa";
 
 export default function Hero() {
   return (
@@ -99,63 +104,41 @@ export default function Hero() {
                 </button>
               </div>
 
-              {/* Checkmarks */}
-              <div className="mt-10 flex flex-col sm:flex-row sm:flex-wrap gap-4 text-sm font-medium text-slate-600">
-                <div className="flex items-center justify-center lg:justify-start gap-2 whitespace-nowrap">
-                  <div className="bg-orange-100 rounded-full p-1 flex-shrink-0">
-                    <svg
-                      className="w-4 h-4 text-orange-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  Sin tarjeta de crédito
-                </div>
-                <div className="flex items-center justify-center lg:justify-start gap-2 whitespace-nowrap">
-                  <div className="bg-orange-100 rounded-full p-1 flex-shrink-0">
-                    <svg
-                      className="w-4 h-4 text-orange-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  Cancela cuando quieras
-                </div>
-                <div className="flex items-center justify-center lg:justify-start gap-2 whitespace-nowrap">
-                  <div className="bg-orange-100 rounded-full p-1 flex-shrink-0">
-                    <svg
-                      className="w-4 h-4 text-orange-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  Soporte 24/7
-                </div>
-              </div>
+{/* Redes Sociales */}
+<div className="mt-10 flex justify-center lg:justify-start gap-4">
+  {/* Instagram */}
+  <a
+    href="https://www.instagram.com/senzoly"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Instagram"
+    className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+  >
+    <FaInstagram size={22} />
+  </a>
+
+  {/* WhatsApp */}
+  <a
+    href="https://wa.me/59899458702"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="WhatsApp"
+    className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+  >
+    <FaWhatsapp size={22} />
+  </a>
+
+  {/* LinkedIn */}
+  <a
+    href="https://www.linkedin.com/company/senzoly"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="LinkedIn"
+    className="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+  >
+    <FaLinkedinIn size={20} />
+  </a>
+</div>
             </div>
 
             {/* Right Column - Image */}
