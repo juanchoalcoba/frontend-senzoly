@@ -65,7 +65,7 @@ export default function SuperAdminLayout() {
           <img
             src="/logotipo.png"
             alt="Senzoly"
-            className="h-8 brightness-0 invert opacity-90"
+            className="h-20 brightness-0 invert opacity-90"
           />
           <button
             onClick={() => setSidebarOpen(false)}

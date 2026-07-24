@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
           <img
             src="/logotipo.png"
             alt="Senzoly"
-            className="h-36 w-full object-contain object-top"
+            className="h-24 w-full object-contain object-top"
           />
         </div>
 

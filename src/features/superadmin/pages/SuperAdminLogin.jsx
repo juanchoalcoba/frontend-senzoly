@@ -40,7 +40,7 @@ export default function SuperAdminLogin() {
           <img
             src="/logotipo.png"
             alt="Senzoly"
-            className="h-36 brightness-0 invert opacity-70"
+            className="h-32 brightness-0 invert opacity-70"
           />
         </div>
 
