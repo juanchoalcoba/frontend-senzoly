@@ -105,7 +105,7 @@ export default function Hero() {
               </div>
 
 {/* Redes Sociales */}
-<div className="mt-8 flex justify-center lg:justify-start gap-4">
+<div className="mt-6 flex justify-center lg:justify-start gap-4">
   {/* Instagram */}
   <a
     href="https://www.instagram.com/senzoly"
