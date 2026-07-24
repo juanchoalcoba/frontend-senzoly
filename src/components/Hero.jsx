@@ -62,7 +62,7 @@ export default function Hero() {
                 <span className="text-[#FF6B00]">negocios que crecen</span>
               </h1>
 
-              <p className="mt-3 text-base text-slate-600 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl mb-8 max-w-xl mx-auto lg:mx-0">
+              <p className="mt-3 text-base text-slate-600 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl mb-8 text-center md:text-left max-w-xl mx-auto lg:mx-0">
                 Senzoly es la plataforma todo-en-uno para gestionar reservas,
                 clientes y equipos de forma fácil y automática. Ahorra tiempo,
                 mejora la experiencia y haz crecer tu negocio.
