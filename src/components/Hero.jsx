@@ -56,7 +56,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              <h1 className="text-5xl tracking-tight font-bold  text-slate-900 sm:text-6xl md:text-6xl lg:text-6xl xl:text-5xl mb-6 leading-16">
+              <h1 className="text-5xl text-center md:text-left tracking-tight font-bold  text-slate-900 sm:text-6xl md:text-6xl lg:text-6xl xl:text-5xl mb-6 leading-16">
                 Reservas simples, <br className="hidden md:block" />
                 <span className="text-[#FF6B00]">negocios que crecen</span>
               </h1>
