@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }) {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${
                     isActive
-                      ? "bg-orange-50 text-orange-600"
+                      ? "theme-nav-active"
                       : "text-slate-600 hover:bg-slate-50"
                   }`
                 }

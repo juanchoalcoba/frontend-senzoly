@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTenantBySlug, getAvailableSlots, createPublicBooking } from '../services/publicApi';
+import { useTheme } from '../../../context/ThemeContext';
 import { 
   Scissors, Clock, DollarSign, Calendar, User, Mail, Phone, 
   ChevronRight, ChevronLeft, CheckCircle2, XCircle, Loader2, MapPin, FileText
@@ -10,6 +11,7 @@ const STEPS = ['Servicio', 'Fecha y Hora', 'Tus Datos', 'Confirmación'];
 
 export default function PublicBookingPage() {
   const { slug } = useParams();
+  const { setRouteThemeSlug } = useTheme();
 
   const [tenantData, setTenantData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,6 +44,12 @@ export default function PublicBookingPage() {
     };
     load();
   }, [slug]);
+
+  useEffect(() => {
+    setRouteThemeSlug(tenantData?.tenant?.businessType?.slug || null);
+
+    return () => setRouteThemeSlug(null);
+  }, [tenantData?.tenant?.businessType?.slug, setRouteThemeSlug]);
 
   useEffect(() => {
     if (selectedService && selectedDate) {
@@ -103,7 +111,7 @@ export default function PublicBookingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 flex items-center justify-center">
+      <div className="theme-public-shell min-h-screen flex items-center justify-center">
         <div className="text-center space-y-3 text-white">
           <Loader2 className="w-10 h-10 animate-spin mx-auto text-orange-400" />
           <p className="text-sm text-slate-400">Cargando información del negocio...</p>
@@ -114,7 +122,7 @@ export default function PublicBookingPage() {
 
   if (error || !tenantData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 flex items-center justify-center p-6">
+      <div className="theme-public-shell min-h-screen flex items-center justify-center p-6">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center space-y-4 max-w-sm">
           <XCircle className="w-12 h-12 text-red-400 mx-auto" />
           <h2 className="text-white font-bold text-xl">Negocio no encontrado</h2>
@@ -127,7 +135,7 @@ export default function PublicBookingPage() {
   const { tenant, services } = tenantData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 font-sans">
+    <div className="theme-public-shell min-h-screen font-sans">
       
       {/* Header del Negocio */}
       <header className="border-b border-white/10 px-6 py-5">
@@ -258,17 +266,22 @@ export default function PublicBookingPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                    {slots.map((s) => (
+                    {slots.map((slot) => (
                       <button
-                        key={s}
-                        onClick={() => setSelectedSlot(s)}
-                        className={`py-2 rounded-lg text-sm font-semibold transition-all ${
-                          selectedSlot === s
+                        key={slot.time}
+                        type="button"
+                        disabled={!slot.available}
+                        onClick={() => setSelectedSlot(slot.time)}
+                        className={`min-h-12 rounded-lg text-sm font-semibold transition-all ${
+                          !slot.available
+                            ? 'bg-slate-800/60 text-slate-500 border border-slate-700/60 cursor-not-allowed'
+                            : selectedSlot === slot.time
                             ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
                             : 'bg-white/5 text-slate-300 border border-white/10 hover:border-orange-400/40 hover:bg-orange-500/10'
                         }`}
                       >
-                        {s}
+                        <span className="block">{slot.time}</span>
+                        {!slot.available && <span className="block text-[10px] font-medium mt-0.5">Ocupado</span>}
                       </button>
                     ))}
                   </div>

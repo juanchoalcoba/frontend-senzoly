@@ -217,7 +217,7 @@ export default function EmployeesPage() {
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Mejora tu plan</h3>
                 <p className="text-slate-600 mb-6">
                   Tu plan actual ({subscription?.plan?.name}) no permite agregar más empleados.
-                  Pásate al plan <span className="font-bold text-orange-600">Equipo</span> para empezar a gestionar a tu personal de forma profesional.
+                  Para agregar más personal, elige un plan con una capacidad mayor.
                 </p>
                 <button 
                   onClick={closeModal}

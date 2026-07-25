@@ -3,7 +3,7 @@ import { Check, X } from 'lucide-react';
 
 const features = [
   { name: 'Reservas por mes', prueba: 'Hasta 20', solo: 'Ilimitadas', equipo: 'Ilimitadas', pro: 'Ilimitadas' },
-  { name: 'Empleados', prueba: '1', solo: '1', equipo: 'Hasta 5', pro: 'Ilimitados' },
+  { name: 'Empleados', prueba: 'Hasta 7', solo: '1', equipo: 'Hasta 7', pro: 'Ilimitados' },
   { name: 'Sucursales', prueba: '1', solo: '1', equipo: '1', pro: 'Ilimitadas' },
   { name: 'Gestión de clientes y servicios', prueba: true, solo: true, equipo: true, pro: true },
   { name: 'Recordatorios automáticos', prueba: true, solo: true, equipo: true, pro: true },

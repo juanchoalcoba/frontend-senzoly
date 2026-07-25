@@ -18,3 +18,116 @@ body {
   background-color: #f8fafc; /* slate-50 */
   color: #0f172a; /* slate-900 */
 }
+
+:root {
+  --theme-primary: #f97316;
+  --theme-primary-strong: #ea580c;
+  --theme-primary-soft: #fff7ed;
+  --theme-primary-muted: #ffedd5;
+  --theme-dark: #7c2d12;
+  --theme-glow: #fb923c;
+}
+
+.theme-brand-panel {
+  background-color: var(--theme-primary);
+}
+
+.theme-brand-glow {
+  background-color: color-mix(in srgb, var(--theme-dark) 42%, transparent);
+}
+
+.theme-primary-button {
+  background-color: var(--theme-primary);
+  color: white;
+}
+
+.theme-primary-button:hover {
+  background-color: var(--theme-primary-strong);
+}
+
+.theme-nav-active {
+  background-color: var(--theme-primary-soft);
+  color: var(--theme-primary-strong);
+}
+
+.theme-preview {
+  background: linear-gradient(135deg, var(--preview-primary-soft), white 72%);
+  border-color: var(--preview-primary-muted);
+}
+
+.theme-preview-swatch {
+  background: linear-gradient(135deg, var(--preview-primary), var(--preview-dark));
+}
+
+.theme-public-shell {
+  background: linear-gradient(135deg, #020617, #0f172a 52%, var(--theme-dark));
+}
+
+/* Adaptación gradual de los acentos existentes al tema del rubro. */
+html[data-business-theme] .bg-orange-50,
+html[data-business-theme] .hover\:bg-orange-50:hover {
+  background-color: var(--theme-primary-soft) !important;
+}
+
+html[data-business-theme] .bg-orange-100,
+html[data-business-theme] .hover\:bg-orange-100:hover {
+  background-color: var(--theme-primary-muted) !important;
+}
+
+html[data-business-theme] .bg-orange-400,
+html[data-business-theme] .bg-orange-500,
+html[data-business-theme] .bg-\[\#FF6B00\],
+html[data-business-theme] .hover\:bg-orange-500:hover {
+  background-color: var(--theme-primary) !important;
+}
+
+html[data-business-theme] .bg-orange-600,
+html[data-business-theme] .hover\:bg-orange-600:hover,
+html[data-business-theme] .hover\:bg-orange-700:hover,
+html[data-business-theme] .hover\:bg-\[\#E56000\]:hover {
+  background-color: var(--theme-primary-strong) !important;
+}
+
+html[data-business-theme] .text-orange-300,
+html[data-business-theme] .text-orange-400 {
+  color: var(--theme-glow) !important;
+}
+
+html[data-business-theme] .text-orange-500,
+html[data-business-theme] .text-orange-600,
+html[data-business-theme] .text-orange-700,
+html[data-business-theme] .text-orange-800,
+html[data-business-theme] .text-orange-950,
+html[data-business-theme] .hover\:text-orange-500:hover,
+html[data-business-theme] .hover\:text-orange-600:hover,
+html[data-business-theme] .hover\:text-orange-700:hover {
+  color: var(--theme-primary-strong) !important;
+}
+
+html[data-business-theme] .bg-orange-500\/10,
+html[data-business-theme] .bg-orange-500\/20,
+html[data-business-theme] .bg-orange-500\/30 {
+  background-color: color-mix(in srgb, var(--theme-primary) 20%, transparent) !important;
+}
+
+html[data-business-theme] .border-orange-500\/30,
+html[data-business-theme] .border-orange-400\/40 {
+  border-color: color-mix(in srgb, var(--theme-primary) 45%, transparent) !important;
+}
+
+html[data-business-theme] .border-orange-100,
+html[data-business-theme] .border-orange-200,
+html[data-business-theme] .border-orange-400,
+html[data-business-theme] .border-orange-500,
+html[data-business-theme] .focus\:border-orange-500:focus {
+  border-color: var(--theme-primary) !important;
+}
+
+html[data-business-theme] .focus\:ring-orange-500:focus,
+html[data-business-theme] .focus-visible\:ring-orange-500\/40:focus-visible {
+  --tw-ring-color: var(--theme-primary) !important;
+}
+
+html[data-business-theme] .to-orange-950 {
+  --tw-gradient-to: var(--theme-dark) var(--tw-gradient-to-position) !important;
+}

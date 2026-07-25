@@ -5,11 +5,11 @@ export default function AuthLayout({ children, title, subtitle }) {
   return (
     <div className="min-h-screen lg:h-screen bg-slate-50 flex flex-col lg:flex-row">
       {/* Left side - Visual/Brand */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-[#FF6B00] flex-col justify-between overflow-hidden h-full">
+      <div className="theme-brand-panel hidden lg:flex lg:w-1/2 relative flex-col justify-between overflow-hidden h-full">
         {/* Background Patterns & Glows */}
         <div className="absolute top-0 left-0 w-full h-full bg-black/10"></div>
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-white/20 blur-3xl rounded-full"></div>
-        <div className="absolute bottom-10 -left-20 w-80 h-80 bg-orange-800/30 blur-3xl rounded-full"></div>
+        <div className="theme-brand-glow absolute bottom-10 -left-20 w-80 h-80 blur-3xl rounded-full"></div>
 
         {/* Content */}
         <div className="relative z-10 p-8 lg:p-12 flex flex-col h-full">
@@ -28,13 +28,13 @@ export default function AuthLayout({ children, title, subtitle }) {
             <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
               Gestiona tu negocio <br /> como un profesional.
             </h1>
-            <p className="text-orange-100 text-lg max-w-md">
+            <p className="text-white/85 text-lg max-w-md">
               Únete a miles de empresas que ya automatizan sus reservas,
               controlan su equipo y multiplican sus ingresos con Senzoly.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-orange-100/80 text-sm mt-auto">
+          <div className="flex items-center gap-4 text-white/70 text-sm mt-auto">
             <span>© {new Date().getFullYear()} Senzoly.</span>
             <a href="#" className="hover:text-white transition-colors">
               Términos

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { verifyEmail } from '../services/authApi';
@@ -6,6 +6,7 @@ import { verifyEmail } from '../services/authApi';
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const requestedTokenRef = useRef(null);
   
   const [status, setStatus] = useState('loading'); // loading, success, error
   const [message, setMessage] = useState('');
@@ -16,6 +17,12 @@ export default function VerifyEmailPage() {
       setMessage('El enlace de verificación no es válido o está incompleto.');
       return;
     }
+
+    if (requestedTokenRef.current === token) {
+      return;
+    }
+
+    requestedTokenRef.current = token;
 
     verifyEmail(token)
       .then(() => {

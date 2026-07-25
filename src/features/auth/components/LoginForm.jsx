@@ -54,9 +54,9 @@ export default function LoginForm() {
       <div>
         <div className="flex justify-between items-center mb-1">
           <label className="block text-sm font-medium text-slate-700">Contraseña</label>
-          <a href="#" className="text-sm font-medium text-orange-600 hover:text-orange-500">
+          <Link to="/forgot-password" className="text-sm font-medium text-orange-600 hover:text-orange-500">
             ¿Olvidaste tu contraseña?
-          </a>
+          </Link>
         </div>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

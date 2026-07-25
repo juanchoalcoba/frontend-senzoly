@@ -25,6 +25,28 @@ export const verifyEmail = async (token) => {
   return data;
 };
 
+export const requestPasswordReset = async (email) => {
+  const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message || 'No fue posible solicitar la recuperación');
+  return data;
+};
+
+export const resetPassword = async (payload) => {
+  const res = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message || 'No fue posible actualizar la contraseña');
+  return data;
+};
+
 export const login = async (credentials) => {
   const res = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',

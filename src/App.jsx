@@ -1,12 +1,15 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Portal Clientes
 import LandingPage from './pages/LandingPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 import VerifyEmailPage from './features/auth/pages/VerifyEmailPage';
+import ForgotPasswordPage from './features/auth/pages/ForgotPasswordPage';
+import ResetPasswordPage from './features/auth/pages/ResetPasswordPage';
 import DashboardPage from './features/dashboard/pages/DashboardPage';
 import EmployeesPage from './features/dashboard/pages/EmployeesPage';
 import CustomersPage from './features/dashboard/pages/CustomersPage';
@@ -26,6 +29,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ThemeProvider>
         <Routes>
 
           {/* ─── Portal Clientes (Tenants) ─── */}
@@ -33,6 +37,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/dashboard"
             element={
@@ -101,10 +107,10 @@ function App() {
           </Route>
 
         </Routes>
+        </ThemeProvider>
       </BrowserRouter>
     </AuthProvider>
   );
 }
 
 export default App;
-

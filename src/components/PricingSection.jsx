@@ -12,6 +12,7 @@ const plans = [
     features: [
       "Hasta 20 reservas",
       "1 agenda",
+      "Hasta 7 empleados",
       "Gestión de clientes",
       "Gestión de servicios",
       "Recordatorios automáticos",
@@ -47,7 +48,7 @@ const plans = [
     description: "Perfecto para pequeños equipos.",
     features: [
       "Todo lo de Solo",
-      "Hasta 5 empleados",
+      "Hasta 7 empleados",
       "Agenda por empleado",
       "Panel administrador",
       "Comisiones",

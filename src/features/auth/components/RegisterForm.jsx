@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, User, Mail, Lock, Loader2, Globe, Clock, Briefcase } from 'lucide-react';
 import { fetchBusinessTypes, registerCompany } from '../services/authApi';
+import { useTheme } from '../../../context/ThemeContext';
+import { getBusinessTheme } from '../../../theme/businessThemes';
 
 export default function RegisterForm() {
+  const { setRouteThemeSlug } = useTheme();
   const [businessTypes, setBusinessTypes] = useState([]);
   const [isLoadingTypes, setIsLoadingTypes] = useState(true);
   
@@ -18,8 +21,14 @@ export default function RegisterForm() {
     firstName: '',
     lastName: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
+
+  const selectedBusinessType = businessTypes.find(
+    (businessType) => businessType.id === formData.businessTypeId
+  );
+  const previewTheme = getBusinessTheme(selectedBusinessType?.slug);
 
   useEffect(() => {
     fetchBusinessTypes()
@@ -28,10 +37,22 @@ export default function RegisterForm() {
       .finally(() => setIsLoadingTypes(false));
   }, []);
 
+  useEffect(() => {
+    setRouteThemeSlug(selectedBusinessType?.slug || null);
+
+    return () => setRouteThemeSlug(null);
+  }, [selectedBusinessType?.slug, setRouteThemeSlug]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setErrorMsg('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMsg('Las contraseñas no coinciden. Revísalas e inténtalo nuevamente.');
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const payload = {
@@ -44,7 +65,8 @@ export default function RegisterForm() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          confirmPassword: formData.confirmPassword
         }
       };
 
@@ -121,6 +143,30 @@ export default function RegisterForm() {
             </select>
           </div>
         </div>
+
+        {selectedBusinessType && (
+          <div
+            className="theme-preview border rounded-xl p-4 flex items-center gap-3 transition-colors"
+            style={{
+              '--preview-primary-soft': previewTheme.primarySoft,
+              '--preview-primary-muted': previewTheme.primaryMuted,
+            }}
+          >
+            <div
+              className="theme-preview-swatch w-10 h-10 rounded-xl shadow-sm"
+              style={{
+                '--preview-primary': previewTheme.primary,
+                '--preview-dark': previewTheme.dark,
+              }}
+            />
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Tema {selectedBusinessType.name}</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Tu panel y página de reservas usarán esta identidad visual.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="w-full">
           <div>
@@ -200,13 +246,30 @@ export default function RegisterForm() {
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
           </div>
+          <p className="mt-1.5 text-xs text-slate-500">Debe tener al menos 8 caracteres.</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Confirmar contraseña</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Lock className="h-5 w-5 text-slate-400" />
+            </div>
+            <input
+              type="password" required minLength={8} autoComplete="new-password"
+              className="block w-full pl-10 px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors sm:text-sm"
+              placeholder="Repite tu contraseña"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+            />
+          </div>
         </div>
       </div>
 
       <button 
         type="submit" 
         disabled={isLoading || isLoadingTypes}
-        className="w-full mt-4 flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-base font-semibold text-white bg-[#FF6B00] hover:bg-[#E56000] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
+        className="theme-primary-button w-full mt-4 flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-base font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
       >
         {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Crear cuenta gratis'}
       </button>
