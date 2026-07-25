@@ -36,12 +36,12 @@ export default function AuthLayout({ children, title, subtitle }) {
 
           <div className="flex items-center gap-4 text-white/70 text-sm mt-auto">
             <span>© {new Date().getFullYear()} Senzoly.</span>
-            <a href="#" className="hover:text-white transition-colors">
+            <Link to="/terms" className="hover:text-white transition-colors">
               Términos
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
+            </Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">
               Privacidad
-            </a>
+            </Link>
           </div>
         </div>
       </div>

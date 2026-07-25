@@ -22,7 +22,8 @@ export default function RegisterForm() {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    acceptTerms: false
   });
 
   const selectedBusinessType = businessTypes.find(
@@ -66,7 +67,8 @@ export default function RegisterForm() {
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
-          confirmPassword: formData.confirmPassword
+          confirmPassword: formData.confirmPassword,
+          acceptTerms: formData.acceptTerms
         }
       };
 
@@ -265,6 +267,19 @@ export default function RegisterForm() {
           </div>
         </div>
       </div>
+
+      <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 cursor-pointer">
+        <input
+          type="checkbox"
+          required
+          checked={formData.acceptTerms}
+          onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
+          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+        />
+        <span className="text-xs leading-5 text-slate-600">
+          Acepto los <Link to="/terms" target="_blank" className="font-semibold text-orange-600 hover:text-orange-700">Términos y Condiciones</Link> y la <Link to="/privacy" target="_blank" className="font-semibold text-orange-600 hover:text-orange-700">Política de Privacidad</Link> de Senzoly.
+        </span>
+      </label>
 
       <button 
         type="submit" 

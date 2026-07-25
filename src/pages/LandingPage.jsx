@@ -5,6 +5,7 @@ import Hero from '../components/Hero';
 import AboutSection from '../components/AboutSection';
 import PricingSection from '../components/PricingSection';
 import CtaSection from '../components/CtaSection';
+import Footer from '../components/Footer';
 
 export default function LandingPage() {
   return (
@@ -16,6 +17,7 @@ export default function LandingPage() {
         <PricingSection />
         <CtaSection />
       </main>
+      <Footer />
       <MobileNav />
     </div>
   );
