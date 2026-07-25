@@ -19,7 +19,7 @@ export default function Footer() {
                 className="h-24 w-auto object-contain"
               />
             </Link>
-            <p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">
+            <p className="mt-3 max-w-sm text-sm text-center md:text-left leading-6 text-slate-500">
               Gestión simple y profesional para negocios que trabajan con
               reservas.
             </p>
