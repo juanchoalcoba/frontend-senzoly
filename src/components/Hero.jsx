@@ -137,17 +137,32 @@ export default function Hero() {
 </div>
             </div>
 
+            <style>{`
+@keyframes heroFloat {
+  0%,100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.03);
+  }
+}
+`}</style>
+
             {/* Right Column - Image */}
             <div className="hidden lg:flex lg:mb-10 lg:col-span-6 relative justify-center lg:justify-end items-center">
-              {/* Background glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-400/20 blur-3xl rounded-full -z-10"></div>
+  {/* Background glow */}
+  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-400/20 blur-3xl rounded-full -z-10"></div>
 
-              <img
-                src="/heroright.png"
-                alt="Senzoly Dashboard"
-                className="w-full max-w-2xl h-auto object-contain drop-shadow-2xl relative z-10"
-              />
-            </div>
+  <img
+    src="/heroright.png"
+    alt="Senzoly Dashboard"
+    className="w-full max-w-2xl h-auto object-contain relative z-10"
+    style={{
+      animation: "heroFloat 6s ease-in-out infinite",
+      filter: "drop-shadow(0 0 35px rgba(251,146,60,.35))",
+    }}
+  />
+</div>
           </div>
         </div>
       </section>
