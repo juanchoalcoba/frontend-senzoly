@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
+import { FaInstagram, FaWhatsapp, FaLinkedinIn } from "react-icons/fa";
+import { HiOutlineCalendarDays } from "react-icons/hi2";
 
 export default function Footer() {
   return (
@@ -19,7 +21,7 @@ export default function Footer() {
                 className="h-24 w-auto object-contain"
               />
             </Link>
-            <p className="mt-3 max-w-sm text-sm text-center md:text-left leading-6 text-slate-500">
+            <p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">
               Gestión simple y profesional para negocios que trabajan con
               reservas.
             </p>
@@ -66,6 +68,40 @@ export default function Footer() {
             © {new Date().getFullYear()} Senzoly. Todos los derechos reservados.
           </span>
           <span>Hecho para negocios que avanzan.</span>
+        </div>
+        <div className="mt-7 flex justify-center lg:justify-start gap-4">
+          {/* Instagram */}
+          <a
+            href="https://www.instagram.com/senzoly"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+          >
+            <FaInstagram size={22} />
+          </a>
+
+          {/* WhatsApp */}
+          <a
+            href="https://wa.me/59899458702"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+          >
+            <FaWhatsapp size={22} />
+          </a>
+
+          {/* LinkedIn */}
+          <a
+            href="https://www.linkedin.com/company/senzoly"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
+          >
+            <FaLinkedinIn size={20} />
+          </a>
         </div>
       </div>
     </footer>
