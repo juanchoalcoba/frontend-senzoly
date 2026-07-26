@@ -53,3 +53,27 @@ export const updateService = async (token, id, updates) => {
   if (!data.success) throw new Error(data.message);
   return data.data;
 };
+
+export const uploadServiceImage = async (token, id, image) => {
+  const formData = new FormData();
+  formData.append('image', image);
+
+  const res = await fetch(`${API_URL}/services/${id}/image`, {
+    method: 'PATCH',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
+export const deleteServiceImage = async (token, id) => {
+  const res = await fetch(`${API_URL}/services/${id}/image`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getTenantBySlug, getAvailableSlots, createPublicBooking } from '../services/publicApi';
 import { useTheme } from '../../../context/ThemeContext';
 import { getBusinessTypePresentation } from '../../../theme/businessTypePresentation';
+import ServiceImage from '../../../components/ServiceImage';
 import { 
   Clock, DollarSign, Calendar, User, Mail, Phone, 
   ChevronRight, ChevronLeft, CheckCircle2, XCircle, Loader2, MapPin, FileText
@@ -211,17 +212,25 @@ export default function PublicBookingPage() {
                     onClick={() => { setSelectedService(s); setStep(1); }}
                     className={`w-full text-left bg-white/5 border ${
                       selectedService?.id === s.id ? 'border-orange-500 bg-orange-500/10' : 'border-white/10 hover:border-white/25'
-                    } rounded-2xl p-4 transition-all`}
+                    } rounded-2xl overflow-hidden transition-all`}
                   >
-                    <p className="text-white font-bold text-base">{s.name}</p>
-                    {s.description && <p className="text-slate-400 text-xs mt-1 line-clamp-2">{s.description}</p>}
-                    <div className="flex items-center gap-3 mt-3 text-xs">
-                      <span className="flex items-center gap-1.5 text-slate-400">
-                        <Clock className="w-3.5 h-3.5 text-orange-400" /> {s.duration_minutes} min
-                      </span>
-                      <span className="flex items-center gap-1.5 font-bold text-orange-300">
-                        <DollarSign className="w-3.5 h-3.5" /> {formatPrice(s.price)}
-                      </span>
+                    <ServiceImage
+                      src={s.image_url}
+                      alt={`Imagen de ${s.name}`}
+                      className="w-full h-32"
+                      placeholderClassName="from-slate-800 to-orange-950 text-orange-300"
+                    />
+                    <div className="p-4">
+                      <p className="text-white font-bold text-base">{s.name}</p>
+                      {s.description && <p className="text-slate-400 text-xs mt-1 line-clamp-2">{s.description}</p>}
+                      <div className="flex items-center gap-3 mt-3 text-xs">
+                        <span className="flex items-center gap-1.5 text-slate-400">
+                          <Clock className="w-3.5 h-3.5 text-orange-400" /> {s.duration_minutes} min
+                        </span>
+                        <span className="flex items-center gap-1.5 font-bold text-orange-300">
+                          <DollarSign className="w-3.5 h-3.5" /> {formatPrice(s.price)}
+                        </span>
+                      </div>
                     </div>
                   </button>
                 ))}

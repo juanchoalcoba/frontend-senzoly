@@ -4,8 +4,11 @@ import {
   getServices, 
   getServiceStats, 
   createService, 
-  updateService 
+  updateService,
+  uploadServiceImage,
+  deleteServiceImage,
 } from '../services/serviceCatalogApi';
+import ServiceImage from '../../../components/ServiceImage';
 import { 
   Briefcase, 
   Plus, 
@@ -19,7 +22,9 @@ import {
   Info, 
   Sparkles,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  ImagePlus,
+  Trash2,
 } from 'lucide-react';
 
 export default function ServicesPage() {
@@ -44,6 +49,13 @@ export default function ServicesPage() {
   });
   const [formError, setFormError] = useState('');
   const [formLoading, setFormLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
+
+  useEffect(() => () => {
+    if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
+  }, [imagePreview]);
 
   const token = localStorage.getItem('token');
 
@@ -78,6 +90,9 @@ export default function ServicesPage() {
         price: service.price || 0,
         isActive: service.is_active ?? true
       });
+      setImageFile(null);
+      setImagePreview(service.image_url || null);
+      setRemoveExistingImage(false);
     } else {
       setEditingService(null);
       setFormData({
@@ -87,6 +102,9 @@ export default function ServicesPage() {
         price: 0,
         isActive: true
       });
+      setImageFile(null);
+      setImagePreview(null);
+      setRemoveExistingImage(false);
     }
     setIsModalOpen(true);
   };
@@ -94,6 +112,40 @@ export default function ServicesPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingService(null);
+    setImageFile(null);
+    setImagePreview(null);
+    setRemoveExistingImage(false);
+  };
+
+  const handleImageSelection = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setFormError('Selecciona una imagen JPEG, PNG o WebP.');
+      event.target.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setFormError('La imagen no puede superar los 5 MB.');
+      event.target.value = '';
+      return;
+    }
+    setFormError('');
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setRemoveExistingImage(false);
+  };
+
+  const handleImageRemoval = () => {
+    if (imageFile) {
+      setImageFile(null);
+      setImagePreview(editingService?.image_url || null);
+      return;
+    }
+    if (editingService?.image_url) {
+      setImagePreview(null);
+      setRemoveExistingImage(true);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -118,13 +170,32 @@ export default function ServicesPage() {
     setFormLoading(true);
 
     try {
-      if (editingService) {
-        const updated = await updateService(token, editingService.id, formData);
-        setServices(prev => prev.map(s => s.id === updated.id ? updated : s));
+      let savedService;
+      const wasEditing = Boolean(editingService);
+      if (wasEditing) {
+        savedService = await updateService(token, editingService.id, formData);
       } else {
-        const created = await createService(token, formData);
-        setServices(prev => [created, ...prev]);
+        savedService = await createService(token, formData);
+        setEditingService(savedService);
       }
+
+      try {
+        if (imageFile) {
+          savedService = await uploadServiceImage(token, savedService.id, imageFile);
+        } else if (wasEditing && removeExistingImage) {
+          savedService = await deleteServiceImage(token, savedService.id);
+        }
+      } catch (imageError) {
+        setServices(prev => wasEditing
+          ? prev.map(s => s.id === savedService.id ? savedService : s)
+          : [savedService, ...prev]);
+        setFormError(`El servicio se guardó, pero no se pudo procesar la imagen: ${imageError.message}`);
+        return;
+      }
+
+      setServices(prev => wasEditing
+        ? prev.map(s => s.id === savedService.id ? savedService : s)
+        : [savedService, ...prev]);
       
       // Actualizar estadísticas
       const updatedStats = await getServiceStats(token);
@@ -300,6 +371,11 @@ export default function ServicesPage() {
                 }`}
               >
                 <div>
+                  <ServiceImage
+                    src={service.image_url}
+                    alt={`Imagen de ${service.name}`}
+                    className="w-full h-36 rounded-xl mb-4"
+                  />
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <h3 className="font-bold text-slate-900 text-base leading-snug">
                       {service.name}
@@ -454,6 +530,34 @@ export default function ServicesPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all resize-none placeholder:text-slate-400"
                 ></textarea>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-700">Imagen del servicio (opcional)</label>
+                  {imagePreview && (
+                    <button
+                      type="button"
+                      onClick={handleImageRemoval}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {imageFile ? 'Descartar selección' : 'Eliminar imagen'}
+                    </button>
+                  )}
+                </div>
+                <label className="block cursor-pointer rounded-xl border border-dashed border-slate-300 hover:border-orange-400 bg-slate-50/70 p-3 transition-colors">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Vista previa" className="h-32 w-full rounded-lg object-cover" />
+                  ) : (
+                    <span className="h-24 flex flex-col items-center justify-center gap-1 text-slate-500 text-xs">
+                      <ImagePlus className="w-5 h-5 text-orange-500" />
+                      Seleccionar imagen
+                    </span>
+                  )}
+                  <span className="block text-center text-[11px] text-slate-500 mt-2">JPEG, PNG o WebP · máximo 5 MB</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageSelection} className="sr-only" />
+                </label>
               </div>
 
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
