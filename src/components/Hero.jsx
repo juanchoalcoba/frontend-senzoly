@@ -1,9 +1,36 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaInstagram, FaWhatsapp, FaLinkedinIn } from "react-icons/fa";
 import { HiOutlineCalendarDays } from "react-icons/hi2";
+import Typed from "typed.js";
 
 export default function Hero() {
+  const typedHeadlineRef = useRef(null);
+
+  useEffect(() => {
+    if (!typedHeadlineRef.current) return undefined;
+
+    // El contenido inicial es el fallback sin JavaScript. Se limpia antes de
+    // iniciar Typed para que el primer ciclo también se escriba desde cero.
+    typedHeadlineRef.current.innerHTML = "";
+
+    const typed = new Typed(typedHeadlineRef.current, {
+      strings: [
+        'Reservas simples,<br /> <span class="typed-headline-accent">negocios que crecen</span>',
+      ],
+      typeSpeed: 42,
+      backSpeed: 24,
+      backDelay: 2400,
+      startDelay: 250,
+      loop: true,
+      showCursor: true,
+      cursorChar: "|",
+      contentType: "html",
+    });
+
+    return () => typed.destroy();
+  }, []);
+
   return (
     <>
       <style>{`
@@ -17,8 +44,143 @@ export default function Hero() {
           background-size: 300% 300%;
           animation: gradientBorder 5s ease infinite;
         }
+
+        @keyframes heroAmbientDrift {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(16px, 12px, 0); }
+        }
+
+        @keyframes heroAmbientDriftReverse {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(-14px, -10px, 0); }
+        }
+
+        .hero-ambient {
+          position: absolute;
+          width: 52rem;
+          height: 52rem;
+          border-radius: 9999px;
+          pointer-events: none;
+        }
+
+        .hero-ambient-indigo {
+          top: -34rem;
+          left: -30rem;
+          background: radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.018) 38%, transparent 70%);
+          animation: heroAmbientDrift 34s ease-in-out infinite;
+        }
+
+        .hero-ambient-cyan {
+          right: -31rem;
+          bottom: -35rem;
+          background: radial-gradient(circle, rgba(6, 182, 212, 0.04) 0%, rgba(6, 182, 212, 0.014) 40%, transparent 70%);
+          animation: heroAmbientDriftReverse 38s ease-in-out infinite;
+        }
+
+        .hero-depth-overlay {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(248, 250, 252, 0.65));
+        }
+
+        .hero-fine-grid {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.012;
+          background-image: linear-gradient(rgba(15, 23, 42, 0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.8) 1px, transparent 1px);
+          background-size: 32px 32px;
+        }
+
+        .hero-content-glow {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 42rem;
+          height: 30rem;
+          border-radius: 9999px;
+          pointer-events: none;
+          background: rgba(99, 102, 241, 1);
+          opacity: 0.08;
+          filter: blur(120px);
+          transform: translate(-50%, -50%);
+        }
+
+        .typed-headline-accent {
+          color: #FF6B00;
+          display: inline-block;
+          white-space: nowrap;
+        }
+
+        .typed-cursor {
+          color: #FF6B00;
+        }
+
+        @media (max-width: 1023px) {
+          .hero-ambient {
+            width: 40rem;
+            height: 40rem;
+          }
+
+          .hero-ambient-indigo {
+            top: -25rem;
+            left: -24rem;
+          }
+
+          .hero-ambient-cyan {
+            right: -25rem;
+            bottom: -27rem;
+          }
+
+          .hero-content-glow {
+            width: 34rem;
+            height: 24rem;
+            filter: blur(96px);
+          }
+        }
+
+        @media (max-width: 639px) {
+          .hero-ambient {
+            width: 30rem;
+            height: 30rem;
+          }
+
+          .hero-ambient-indigo {
+            top: -19rem;
+            left: -18rem;
+          }
+
+          .hero-ambient-cyan {
+            right: -20rem;
+            bottom: -21rem;
+          }
+
+          .hero-content-glow {
+            width: 24rem;
+            height: 18rem;
+            filter: blur(72px);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-ambient-indigo,
+          .hero-ambient-cyan,
+          .typed-cursor {
+            animation: none;
+          }
+
+          .typed-cursor {
+            display: none;
+          }
+        }
       `}</style>
-      <section className="relative overflow-hidden bg-white min-h-[calc(100vh-5rem)] flex items-center py-12 lg:pt-12 lg:pb-12 2xl:pt-16 2xl:pb-20">
+      <section className="relative isolate overflow-hidden bg-white min-h-[calc(100vh-5rem)] flex items-center py-12 lg:pt-12 lg:pb-12 2xl:pt-16 2xl:pb-20">
+        <div aria-hidden="true" className="hero-ambient hero-ambient-indigo" />
+        <div aria-hidden="true" className="hero-ambient hero-ambient-cyan" />
+        <div aria-hidden="true" className="hero-depth-overlay" />
+        <div aria-hidden="true" className="hero-fine-grid" />
+        <div aria-hidden="true" className="hero-content-glow" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
             {/* Left Column - Text content */}
@@ -53,9 +215,14 @@ export default function Hero() {
                 </div>
               </div>
 
-              <h1 className="text-4xl text-center md:text-left tracking-tight font-bold  text-slate-900 sm:text-6xl md:text-6xl lg:text-6xl xl:text-5xl mb-6 lg:leading-16">
-                Reservas simples, <br className="hidden md:block" />
-                <span className="text-[#FF6B00]">negocios que crecen</span>
+              <h1
+                aria-label="Reservas simples, negocios que crecen"
+                className="min-h-[4.8rem] text-[clamp(1.75rem,8.5vw,2.25rem)] leading-[1.2] text-center tracking-tight font-bold text-slate-900 sm:min-h-[6rem] sm:text-5xl md:min-h-[7.5rem] md:text-6xl md:text-left lg:min-h-[8rem] lg:text-6xl xl:text-5xl mb-6 lg:leading-16"
+              >
+                <span ref={typedHeadlineRef} aria-hidden="true">
+                  Reservas simples,<br />
+                  <span className="typed-headline-accent">negocios que crecen</span>
+                </span>
               </h1>
 
               <p className="mt-3 text-base text-slate-600 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl mb-8 text-center md:text-left max-w-xl mx-auto lg:mx-0">
@@ -145,9 +312,6 @@ export default function Hero() {
 
             {/* Right Column - Image */}
             <div className="hidden lg:flex lg:mb-10 lg:col-span-6 relative justify-center lg:justify-end items-center">
-              {/* Background glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-400/20 blur-3xl rounded-full -z-10"></div>
-
               <img
                 src="/heroright.png"
                 alt="Senzoly Dashboard"
