@@ -57,6 +57,17 @@ export default function ServicesPage() {
     if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
   }, [imagePreview]);
 
+  useEffect(() => {
+    if (!isModalOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isModalOpen]);
+
   const token = localStorage.getItem('token');
 
   const loadData = async () => {
@@ -436,17 +447,23 @@ export default function ServicesPage() {
 
       {/* Modal de Crear / Editar Servicio */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-slate-900/40 p-4 backdrop-blur-xs sm:p-6">
+          <div className="flex min-h-full items-center justify-center">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="service-modal-title"
+              className="my-auto flex w-full max-w-md flex-col overflow-y-auto rounded-2xl border border-slate-100 bg-white shadow-xl max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-3rem)]"
+            >
             
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="sticky top-0 z-10 p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/95 backdrop-blur-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold shrink-0">
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 id="service-modal-title" className="text-base font-bold text-slate-900">
                     {editingService ? 'Editar Servicio' : 'Nuevo Servicio'}
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -463,7 +480,7 @@ export default function ServicesPage() {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
               {formError && (
                 <div className="p-3 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100 flex items-center gap-2">
                   <X className="w-4 h-4 shrink-0" />
@@ -597,6 +614,7 @@ export default function ServicesPage() {
               </div>
             </form>
 
+            </div>
           </div>
         </div>
       )}
