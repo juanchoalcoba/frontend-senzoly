@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getTenantBySlug, getAvailableSlots, createPublicBooking } from '../services/publicApi';
 import { useTheme } from '../../../context/ThemeContext';
+import { getBusinessTypePresentation } from '../../../theme/businessTypePresentation';
 import { 
-  Scissors, Clock, DollarSign, Calendar, User, Mail, Phone, 
+  Clock, DollarSign, Calendar, User, Mail, Phone, 
   ChevronRight, ChevronLeft, CheckCircle2, XCircle, Loader2, MapPin, FileText
 } from 'lucide-react';
 
@@ -133,6 +134,8 @@ export default function PublicBookingPage() {
   }
 
   const { tenant, services } = tenantData;
+  const presentation = getBusinessTypePresentation(tenant.businessType?.slug);
+  const BusinessIcon = presentation.icon;
 
   return (
     <div className="theme-public-shell min-h-screen font-sans">
@@ -197,7 +200,7 @@ export default function PublicBookingPage() {
             <h2 className="text-white font-bold text-xl">¿Qué servicio deseas agendar?</h2>
             {services.length === 0 ? (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-slate-400">
-                <Scissors className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+                <BusinessIcon className="w-8 h-8 mx-auto mb-2 text-slate-600" />
                 <p>El negocio no tiene servicios activos en este momento.</p>
               </div>
             ) : (
@@ -306,7 +309,7 @@ export default function PublicBookingPage() {
           <div className="space-y-5">
             {/* Summary bar */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-wrap gap-3 text-xs text-slate-400">
-              <span className="flex items-center gap-1"><Scissors className="w-3.5 h-3.5 text-orange-500" /> {selectedService.name}</span>
+              <span className="flex items-center gap-1"><BusinessIcon className="w-3.5 h-3.5 text-orange-500" /> {selectedService.name}</span>
               <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-orange-500" /> {selectedDate}</span>
               <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-orange-500" /> {selectedSlot}</span>
             </div>
@@ -412,9 +415,9 @@ export default function PublicBookingPage() {
             </div>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-left space-y-4 max-w-sm mx-auto">
               <div className="flex items-center gap-3 text-sm">
-                <Scissors className="w-4 h-4 text-orange-400 shrink-0" />
+                <BusinessIcon className="w-4 h-4 text-orange-400 shrink-0" />
                 <div>
-                  <p className="text-slate-400 text-xs">Servicio</p>
+                  <p className="text-slate-400 text-xs">{presentation.serviceLabel}</p>
                   <p className="text-white font-semibold">{confirmation.service.name}</p>
                 </div>
               </div>

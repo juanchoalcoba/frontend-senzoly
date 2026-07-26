@@ -4,7 +4,9 @@ import {
   getTenantProfile, 
   updateTenantProfile, 
   getBusinessHours, 
-  updateBusinessHours 
+  updateBusinessHours,
+  getBookingRules,
+  updateBookingRules,
 } from '../services/settingsApi';
 import { 
   Settings, 
@@ -32,7 +34,7 @@ const DAYS_MAP = [
 ];
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'hours'
+  const [activeTab, setActiveTab] = useState('profile');
 
   // Profile State
   const [profile, setProfile] = useState({
@@ -51,6 +53,11 @@ export default function SettingsPage() {
   const [hoursLoading, setHoursLoading] = useState(true);
   const [hoursSaving, setHoursSaving] = useState(false);
   const [hoursMessage, setHoursMessage] = useState(null); // { type: 'success'|'error', text: '' }
+
+  const [bookingRules, setBookingRules] = useState({ slotIntervalMinutes: 30, slotAlignment: 'BUSINESS_OPEN' });
+  const [bookingRulesLoading, setBookingRulesLoading] = useState(true);
+  const [bookingRulesSaving, setBookingRulesSaving] = useState(false);
+  const [bookingRulesMessage, setBookingRulesMessage] = useState(null);
 
   const token = localStorage.getItem('token');
 
@@ -92,9 +99,25 @@ export default function SettingsPage() {
     }
   };
 
+  const loadBookingRules = async () => {
+    try {
+      setBookingRulesLoading(true);
+      const data = await getBookingRules(token);
+      setBookingRules({
+        slotIntervalMinutes: data.slot_interval_minutes,
+        slotAlignment: data.slot_alignment,
+      });
+    } catch (err) {
+      setBookingRulesMessage({ type: 'error', text: err.message });
+    } finally {
+      setBookingRulesLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadProfile();
     loadHours();
+    loadBookingRules();
   }, []);
 
   const handleProfileSubmit = async (e) => {
@@ -169,6 +192,25 @@ export default function SettingsPage() {
     );
   };
 
+  const handleBookingRulesSubmit = async (e) => {
+    e.preventDefault();
+    setBookingRulesMessage(null);
+    setBookingRulesSaving(true);
+
+    try {
+      const updated = await updateBookingRules(token, bookingRules);
+      setBookingRules({
+        slotIntervalMinutes: updated.slot_interval_minutes,
+        slotAlignment: updated.slot_alignment,
+      });
+      setBookingRulesMessage({ type: 'success', text: 'Reglas de agenda actualizadas correctamente.' });
+    } catch (err) {
+      setBookingRulesMessage({ type: 'error', text: err.message || 'Error al guardar las reglas de agenda.' });
+    } finally {
+      setBookingRulesSaving(false);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6">
@@ -204,6 +246,17 @@ export default function SettingsPage() {
           >
             <Clock className="w-4 h-4" />
             Horario General de Atención
+          </button>
+          <button
+            onClick={() => setActiveTab('booking-rules')}
+            className={`flex items-center gap-2 py-3 px-4 text-sm font-semibold border-b-2 transition-all ${
+              activeTab === 'booking-rules'
+                ? 'border-orange-500 text-orange-600'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Clock className="w-4 h-4" />
+            Reglas de Agenda
           </button>
         </div>
 
@@ -464,6 +517,73 @@ export default function SettingsPage() {
               )}
             </div>
 
+          </div>
+        )}
+
+        {activeTab === 'booking-rules' && (
+          <div className="space-y-6">
+            <div className="bg-slate-100/70 border border-slate-200/60 rounded-2xl p-4 flex items-start gap-3 text-slate-700 text-xs">
+              <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+              <span>
+                Define cada cuánto comienzan los turnos públicos. Si eliges <strong>horas redondas</strong>, una cancha que abre a las 09:30 ofrecerá su primer turno a las 10:00.
+              </span>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
+              {bookingRulesLoading ? (
+                <div className="p-8 text-center text-slate-400">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent mb-2"></div>
+                  <p className="text-sm">Cargando reglas de agenda...</p>
+                </div>
+              ) : (
+                <form onSubmit={handleBookingRulesSubmit} className="space-y-6">
+                  {bookingRulesMessage && (
+                    <div className={`p-4 rounded-xl text-xs flex items-center gap-2 ${
+                      bookingRulesMessage.type === 'success'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                        : 'bg-red-50 text-red-600 border border-red-100'
+                    }`}>
+                      {bookingRulesMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                      <span>{bookingRulesMessage.text}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-800 mb-2">Intervalo entre turnos</label>
+                    <select
+                      value={bookingRules.slotIntervalMinutes}
+                      onChange={(e) => setBookingRules((current) => ({ ...current, slotIntervalMinutes: Number(e.target.value) }))}
+                      className="w-full max-w-sm px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 outline-none focus:border-orange-500"
+                    >
+                      <option value={15}>Cada 15 minutos</option>
+                      <option value={30}>Cada 30 minutos</option>
+                      <option value={60}>Cada 60 minutos</option>
+                    </select>
+                    <p className="mt-2 text-xs text-slate-500">Las reservas pueden durar más que el intervalo; el sistema seguirá bloqueando cualquier solapamiento.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-800 mb-2">Alineación de inicio</label>
+                    <select
+                      value={bookingRules.slotAlignment}
+                      onChange={(e) => setBookingRules((current) => ({ ...current, slotAlignment: e.target.value }))}
+                      className="w-full max-w-sm px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 outline-none focus:border-orange-500"
+                    >
+                      <option value="BUSINESS_OPEN">Desde la hora de apertura</option>
+                      <option value="CLOCK_HOUR">Alineado al reloj</option>
+                    </select>
+                    <p className="mt-2 text-xs text-slate-500">Para Canchas recomendamos 60 minutos y “Alineado al reloj” para ofrecer 09:00, 10:00, 11:00, etc.</p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex justify-end">
+                    <button type="submit" disabled={bookingRulesSaving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-semibold shadow-sm transition-all disabled:opacity-50">
+                      <Save className="w-4 h-4" />
+                      {bookingRulesSaving ? 'Guardando reglas...' : 'Guardar Reglas de Agenda'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         )}
 

@@ -44,3 +44,23 @@ export const updateBusinessHours = async (token, hoursArray) => {
   if (!data.success) throw new Error(data.message);
   return data.data;
 };
+
+export const getBookingRules = async (token) => {
+  const res = await fetch(`${API_URL}/settings/booking-rules`, {
+    headers: getHeaders(token)
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
+export const updateBookingRules = async (token, rules) => {
+  const res = await fetch(`${API_URL}/settings/booking-rules`, {
+    method: 'PATCH',
+    headers: getHeaders(token),
+    body: JSON.stringify(rules)
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
