@@ -65,8 +65,12 @@ export default function BookingsPage() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
-    const [y, m, d] = dateStr.split('-');
-    return `${d}/${m}/${y}`;
+    // PostgreSQL puede serializar un DATE como ISO (2026-07-27T00:00:00.000Z).
+    // Trabajamos con la porción de fecha para evitar mostrar la hora UTC al usuario.
+    const dateOnly = String(dateStr).split('T')[0];
+    const [y, m, d] = dateOnly.split('-');
+    if (!y || !m || !d) return '-';
+    return `${Number(d)}/${Number(m)}/${y}`;
   };
 
   const formatTime = (timeStr) => {
