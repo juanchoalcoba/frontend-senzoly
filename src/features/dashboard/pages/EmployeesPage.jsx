@@ -317,8 +317,8 @@ export default function EmployeesPage() {
                         onChange={e => setFormData({ ...formData, commissionType: e.target.value })}
                         className="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       >
-                        <option value="percentage">Percentage</option>
-                        <option value="fixed">Fixed</option>
+                        <option value="percentage">Porcentaje</option>
+                        <option value="fixed">Fijo</option>
                       </select>
                     </div>
                     <div>
