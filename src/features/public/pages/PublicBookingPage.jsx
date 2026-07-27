@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getTenantBySlug, getAvailableSlots, createPublicBooking } from '../services/publicApi';
+import { getTenantBySlug, getAvailableProfessionals, getAvailableSlots, createPublicBooking } from '../services/publicApi';
 import { useTheme } from '../../../context/ThemeContext';
 import { getBusinessTypePresentation } from '../../../theme/businessTypePresentation';
 import ServiceImage from '../../../components/ServiceImage';
@@ -9,7 +9,7 @@ import {
   ChevronRight, ChevronLeft, CheckCircle2, XCircle, Loader2, MapPin, FileText
 } from 'lucide-react';
 
-const STEPS = ['Servicio', 'Fecha y Hora', 'Tus Datos', 'Confirmación'];
+const STEPS = ['Servicio', 'Profesional', 'Fecha y Hora', 'Tus Datos', 'Confirmación'];
 
 export default function PublicBookingPage() {
   const { slug } = useParams();
@@ -21,6 +21,9 @@ export default function PublicBookingPage() {
 
   const [step, setStep] = useState(0);
   const [selectedService, setSelectedService] = useState(null);
+  const [professionals, setProfessionals] = useState([]);
+  const [professionalsLoading, setProfessionalsLoading] = useState(false);
+  const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedSlot, setSelectedSlot] = useState('');
   const [slots, setSlots] = useState([]);
@@ -52,6 +55,30 @@ export default function PublicBookingPage() {
 
     return () => setRouteThemeSlug(null);
   }, [tenantData?.tenant?.businessType?.slug, setRouteThemeSlug]);
+
+  useEffect(() => {
+    if (!selectedService) return;
+
+    let isCurrentRequest = true;
+    const fetchProfessionals = async () => {
+      setProfessionalsLoading(true);
+      setProfessionals([]);
+      setSelectedProfessional(null);
+      try {
+        const data = await getAvailableProfessionals(slug, selectedService.id);
+        if (!isCurrentRequest) return;
+        setProfessionals(data);
+        if (data.length === 1) setSelectedProfessional(data[0]);
+      } catch (err) {
+        if (isCurrentRequest) setProfessionals([]);
+      } finally {
+        if (isCurrentRequest) setProfessionalsLoading(false);
+      }
+    };
+
+    fetchProfessionals();
+    return () => { isCurrentRequest = false; };
+  }, [selectedService, slug]);
 
   useEffect(() => {
     if (selectedService && selectedDate) {
@@ -101,13 +128,14 @@ export default function PublicBookingPage() {
     try {
       const result = await createPublicBooking(slug, {
         serviceId: selectedService.id,
+        employeeId: selectedProfessional.id,
         bookingDate: selectedDate,
         startTime: selectedSlot,
         customer: customerForm,
         notes: customerForm.notes,
       });
       setConfirmation(result);
-      setStep(3);
+      setStep(4);
     } catch (err) {
       setFormError(err.message || 'Error al confirmar la reserva.');
     } finally {
@@ -176,10 +204,10 @@ export default function PublicBookingPage() {
       </header>
 
       {/* Stepper */}
-      {step < 3 && (
+      {step < 4 && (
         <div className="max-w-2xl mx-auto px-6 pt-8">
           <div className="flex items-center gap-1">
-            {STEPS.slice(0, 3).map((s, i) => (
+            {STEPS.slice(0, 4).map((s, i) => (
               <React.Fragment key={i}>
                 <div className={`flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-full transition-all ${
                   step === i ? 'bg-orange-500 text-white' : step > i ? 'bg-orange-500/20 text-orange-400' : 'text-slate-600'
@@ -189,7 +217,7 @@ export default function PublicBookingPage() {
                   }`}>{step > i ? '✓' : i + 1}</span>
                   <span className="hidden sm:inline">{s}</span>
                 </div>
-                {i < 2 && <div className={`flex-1 h-px ${step > i ? 'bg-orange-500/60' : 'bg-slate-700'}`}></div>}
+                {i < 3 && <div className={`flex-1 h-px ${step > i ? 'bg-orange-500/60' : 'bg-slate-700'}`}></div>}
               </React.Fragment>
             ))}
           </div>
@@ -213,7 +241,12 @@ export default function PublicBookingPage() {
                 {services.map((s) => (
                   <button
                     key={s.id}
-                    onClick={() => { setSelectedService(s); setStep(1); }}
+                    onClick={() => {
+                      setSelectedService(s);
+                      setSelectedDate('');
+                      setSelectedSlot('');
+                      setStep(1);
+                    }}
                     className={`w-full text-left bg-white/5 border ${
                       selectedService?.id === s.id ? 'border-orange-500 bg-orange-500/10' : 'border-white/10 hover:border-white/25'
                     } rounded-2xl overflow-hidden transition-all`}
@@ -243,8 +276,86 @@ export default function PublicBookingPage() {
           </div>
         )}
 
-        {/* PASO 1: FECHA Y HORA */}
+        {/* PASO 1: SELECCIÓN DE PROFESIONAL */}
         {step === 1 && selectedService && (
+          <div className="space-y-5">
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-center justify-between">
+              <div>
+                <p className="text-orange-300 text-xs font-semibold uppercase tracking-wide">Servicio seleccionado</p>
+                <p className="text-white font-bold">{selectedService.name}</p>
+                <p className="text-slate-400 text-xs">{selectedService.duration_minutes} min · {formatPrice(selectedService.price)}</p>
+              </div>
+              <button onClick={() => setStep(0)} className="text-slate-400 hover:text-white text-xs flex items-center gap-1">
+                <ChevronLeft className="w-4 h-4" /> Cambiar
+              </button>
+            </div>
+
+            <div>
+              <h2 className="text-white font-bold text-xl mb-1">Elige tu profesional</h2>
+              <p className="text-slate-400 text-sm">Selecciona quién realizará tu servicio.</p>
+            </div>
+
+            {professionalsLoading ? (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-slate-400">
+                <Loader2 className="w-6 h-6 animate-spin mx-auto mb-3 text-orange-400" />
+                Buscando profesionales disponibles...
+              </div>
+            ) : professionals.length === 0 ? (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-slate-400">
+                <User className="w-8 h-8 mx-auto mb-3 text-slate-600" />
+                <p className="text-white font-semibold">No hay profesionales disponibles</p>
+                <p className="text-sm mt-1">Actualmente no hay profesionales asignados a este servicio.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {professionals.map((professional) => {
+                  const isSelected = selectedProfessional?.id === professional.id;
+                  return (
+                    <button
+                      key={professional.id}
+                      type="button"
+                      onClick={() => setSelectedProfessional(professional)}
+                      className={`group w-full text-left rounded-2xl border p-4 transition-all duration-200 ${
+                        isSelected
+                          ? 'border-orange-500 bg-orange-500/10 shadow-lg shadow-orange-500/10'
+                          : 'border-white/10 bg-white/5 hover:border-orange-400/50 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
+                          isSelected ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300 group-hover:bg-slate-700'
+                        }`}>
+                          <User className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-white font-bold truncate">{professional.first_name} {professional.last_name}</p>
+                          <p className="text-slate-400 text-xs mt-0.5">Profesional del servicio</p>
+                        </div>
+                        {isSelected && <CheckCircle2 className="w-5 h-5 text-orange-400 shrink-0" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="flex justify-between">
+              <button onClick={() => setStep(0)} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-all">
+                <ChevronLeft className="w-4 h-4" /> Volver
+              </button>
+              <button
+                onClick={() => setStep(2)}
+                disabled={!selectedProfessional || professionalsLoading}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm disabled:opacity-40 transition-all"
+              >
+                Continuar <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PASO 2: FECHA Y HORA */}
+        {step === 2 && selectedService && selectedProfessional && (
           <div className="space-y-5">
             {/* Selected service summary */}
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-center justify-between">
@@ -253,7 +364,7 @@ export default function PublicBookingPage() {
                 <p className="text-white font-bold">{selectedService.name}</p>
                 <p className="text-slate-400 text-xs">{selectedService.duration_minutes} min · {formatPrice(selectedService.price)}</p>
               </div>
-              <button onClick={() => setStep(0)} className="text-slate-400 hover:text-white text-xs flex items-center gap-1">
+              <button onClick={() => setStep(1)} className="text-slate-400 hover:text-white text-xs flex items-center gap-1">
                 <ChevronLeft className="w-4 h-4" /> Cambiar
               </button>
             </div>
@@ -307,7 +418,7 @@ export default function PublicBookingPage() {
 
             <div className="flex justify-end">
               <button
-                onClick={() => setStep(2)}
+                onClick={() => setStep(3)}
                 disabled={!selectedDate || !selectedSlot}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm disabled:opacity-40 transition-all"
               >
@@ -317,12 +428,13 @@ export default function PublicBookingPage() {
           </div>
         )}
 
-        {/* PASO 2: DATOS DEL CLIENTE */}
-        {step === 2 && (
+        {/* PASO 3: DATOS DEL CLIENTE */}
+        {step === 3 && selectedProfessional && (
           <div className="space-y-5">
             {/* Summary bar */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-wrap gap-3 text-xs text-slate-400">
               <span className="flex items-center gap-1"><BusinessIcon className="w-3.5 h-3.5 text-orange-500" /> {selectedService.name}</span>
+              <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-orange-500" /> {selectedProfessional.first_name} {selectedProfessional.last_name}</span>
               <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-orange-500" /> {selectedDate}</span>
               <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-orange-500" /> {selectedSlot}</span>
             </div>
@@ -400,7 +512,7 @@ export default function PublicBookingPage() {
             </div>
 
             <div className="flex justify-between">
-              <button onClick={() => setStep(1)} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-all">
+              <button onClick={() => setStep(2)} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-all">
                 <ChevronLeft className="w-4 h-4" /> Volver
               </button>
               <button
@@ -414,8 +526,8 @@ export default function PublicBookingPage() {
           </div>
         )}
 
-        {/* PASO 3: CONFIRMACIÓN */}
-        {step === 3 && confirmation && (
+        {/* PASO 4: CONFIRMACIÓN */}
+        {step === 4 && confirmation && (
           <div className="text-center space-y-6 py-8">
             <div className="w-20 h-20 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-10 h-10 text-emerald-400" />
@@ -439,6 +551,13 @@ export default function PublicBookingPage() {
                 <div>
                   <p className="text-slate-400 text-xs">Fecha y Hora</p>
                   <p className="text-white font-semibold">{confirmation.booking.booking_date} — {confirmation.booking.start_time?.substring(0,5)}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <User className="w-4 h-4 text-orange-400 shrink-0" />
+                <div>
+                  <p className="text-slate-400 text-xs">Profesional</p>
+                  <p className="text-white font-semibold">{confirmation.employee.first_name} {confirmation.employee.last_name}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-sm">

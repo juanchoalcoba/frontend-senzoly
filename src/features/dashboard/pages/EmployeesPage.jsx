@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { getEmployees, createEmployee, updateEmployee, deleteEmployee } from '../services/employeeApi';
+import { getServices } from '../services/serviceCatalogApi';
 import { useAuth } from '../../../context/AuthContext';
 import { Plus, Edit2, Trash2, X, Lock } from 'lucide-react';
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -21,6 +23,7 @@ export default function EmployeesPage() {
     active: true,
     commissionType: 'percentage',
     commissionValue: 0,
+    serviceIds: [],
   });
   const [formError, setFormError] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -43,7 +46,17 @@ export default function EmployeesPage() {
 
   useEffect(() => {
     loadEmployees();
+    loadServices();
   }, []);
+
+  const loadServices = async () => {
+    try {
+      const data = await getServices(token);
+      setServices(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const openModal = (employee = null) => {
     setFormError('');
@@ -70,6 +83,7 @@ export default function EmployeesPage() {
         active: employee.active ?? employee.is_active ?? true,
         commissionType: employee.commission_type || 'percentage',
         commissionValue: employee.commission_value ?? 0,
+        serviceIds: employee.service_ids || [],
       });
     } else {
       setEditingEmployee(null);
@@ -81,6 +95,7 @@ export default function EmployeesPage() {
         active: true,
         commissionType: 'percentage',
         commissionValue: 0,
+        serviceIds: [],
       });
     }
     setIsModalOpen(true);
@@ -334,6 +349,34 @@ export default function EmployeesPage() {
                         className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Servicios asignados</label>
+                    {services.length === 0 ? (
+                      <p className="p-3 text-sm text-slate-500 border border-slate-200 rounded-lg">
+                        No hay servicios disponibles para asignar.
+                      </p>
+                    ) : (
+                      <div className="max-h-36 overflow-y-auto rounded-lg border border-slate-200 divide-y divide-slate-100">
+                        {services.map((service) => (
+                          <label key={service.id} className="flex items-center gap-3 p-3 text-sm text-slate-700 cursor-pointer hover:bg-slate-50">
+                            <input
+                              type="checkbox"
+                              checked={formData.serviceIds.includes(service.id)}
+                              onChange={(e) => setFormData({
+                                ...formData,
+                                serviceIds: e.target.checked
+                                  ? [...formData.serviceIds, service.id]
+                                  : formData.serviceIds.filter((serviceId) => serviceId !== service.id),
+                              })}
+                              className="w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                            />
+                            <span>{service.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 

@@ -14,6 +14,13 @@ export const getAvailableSlots = async (slug, serviceId, date) => {
   return data.data;
 };
 
+export const getAvailableProfessionals = async (slug, serviceId) => {
+  const res = await fetch(`${API_URL}/public/tenant/${slug}/professionals?serviceId=${serviceId}`);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
 export const createPublicBooking = async (slug, bookingPayload) => {
   const res = await fetch(`${API_URL}/public/tenant/${slug}/bookings`, {
     method: 'POST',
