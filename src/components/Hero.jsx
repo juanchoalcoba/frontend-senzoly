@@ -220,8 +220,11 @@ export default function Hero() {
                 className="min-h-[4.8rem] text-[clamp(1.75rem,8.5vw,2.25rem)] leading-[1.2] text-center tracking-tight font-bold text-slate-900 sm:min-h-[6rem] sm:text-5xl md:min-h-[7.5rem] md:text-6xl md:text-left lg:min-h-[8rem] lg:text-6xl xl:text-5xl mb-6 lg:leading-16"
               >
                 <span ref={typedHeadlineRef} aria-hidden="true">
-                  Reservas simples,<br />
-                  <span className="typed-headline-accent">negocios que crecen</span>
+                  Reservas simples,
+                  <br />
+                  <span className="typed-headline-accent">
+                    negocios que crecen
+                  </span>
                 </span>
               </h1>
 
@@ -313,7 +316,7 @@ export default function Hero() {
             {/* Right Column - Image */}
             <div className="hidden lg:flex lg:mb-10 lg:col-span-6 relative justify-center lg:justify-end items-center">
               <img
-                src="/heroright.png"
+                src="/heroright.webp"
                 alt="Senzoly Dashboard"
                 className="w-full max-w-2xl h-auto object-contain relative z-10"
                 style={{
