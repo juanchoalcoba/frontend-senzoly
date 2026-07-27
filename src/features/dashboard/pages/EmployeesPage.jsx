@@ -13,7 +13,15 @@ export default function EmployeesPage() {
   const [editingEmployee, setEditingEmployee] = useState(null);
   
   // Form state
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    active: true,
+    commissionType: 'percentage',
+    commissionValue: 0,
+  });
   const [formError, setFormError] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [isLimitReached, setIsLimitReached] = useState(false);
@@ -58,11 +66,22 @@ export default function EmployeesPage() {
         firstName: employee.first_name, 
         lastName: employee.last_name, 
         email: employee.email || '', 
-        phone: employee.phone || '' 
+        phone: employee.phone || '',
+        active: employee.active ?? employee.is_active ?? true,
+        commissionType: employee.commission_type || 'percentage',
+        commissionValue: employee.commission_value ?? 0,
       });
     } else {
       setEditingEmployee(null);
-      setFormData({ firstName: '', lastName: '', email: '', phone: '' });
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        active: true,
+        commissionType: 'percentage',
+        commissionValue: 0,
+      });
     }
     setIsModalOpen(true);
   };
@@ -276,6 +295,45 @@ export default function EmployeesPage() {
                       onChange={e => setFormData({...formData, phone: e.target.value})}
                       className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Estado</label>
+                    <select
+                      value={formData.active ? 'active' : 'inactive'}
+                      onChange={e => setFormData({ ...formData, active: e.target.value === 'active' })}
+                      className="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                      <option value="active">Activo</option>
+                      <option value="inactive">Inactivo</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de comisión</label>
+                      <select
+                        value={formData.commissionType}
+                        onChange={e => setFormData({ ...formData, commissionType: e.target.value })}
+                        className="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      >
+                        <option value="percentage">Percentage</option>
+                        <option value="fixed">Fixed</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Valor de la comisión</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max={formData.commissionType === 'percentage' ? '100' : undefined}
+                        step="0.01"
+                        required
+                        value={formData.commissionValue}
+                        onChange={e => setFormData({ ...formData, commissionValue: e.target.value })}
+                        className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      />
+                    </div>
                   </div>
                 </div>
                 
