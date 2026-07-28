@@ -760,8 +760,9 @@ export default function PublicBookingPage() {
                 <div>
                   <p className="text-slate-400 text-xs">Profesional</p>
                   <p className="text-white font-semibold">
-                    {confirmation.employee.first_name}{" "}
-                    {confirmation.employee.last_name}
+                    {confirmation.employee
+                      ? `${confirmation.employee.first_name} ${confirmation.employee.last_name}`
+                      : "No aplica"}
                   </p>
                 </div>
               </div>
