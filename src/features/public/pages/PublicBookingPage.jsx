@@ -81,23 +81,32 @@ export default function PublicBookingPage() {
   }, [selectedService, slug]);
 
   useEffect(() => {
-    if (selectedService && selectedDate) {
-      const fetchSlots = async () => {
-        setSlotsLoading(true);
-        setSlots([]);
-        setSelectedSlot('');
-        try {
-          const data = await getAvailableSlots(slug, selectedService.id, selectedDate);
-          setSlots(data);
-        } catch (err) {
-          setSlots([]);
-        } finally {
-          setSlotsLoading(false);
-        }
-      };
-      fetchSlots();
+    if (!selectedService || !selectedProfessional || !selectedDate) {
+      setSlots([]);
+      setSelectedSlot('');
+      return;
     }
-  }, [selectedService, selectedDate]);
+
+    const fetchSlots = async () => {
+      setSlotsLoading(true);
+      setSlots([]);
+      setSelectedSlot('');
+      try {
+        const data = await getAvailableSlots(
+          slug,
+          selectedService.id,
+          selectedProfessional.id,
+          selectedDate
+        );
+        setSlots(data);
+      } catch (err) {
+        setSlots([]);
+      } finally {
+        setSlotsLoading(false);
+      }
+    };
+    fetchSlots();
+  }, [selectedService, selectedProfessional, selectedDate, slug]);
 
   const getTodayStr = () => {
     const d = new Date();
