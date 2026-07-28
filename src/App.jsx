@@ -28,6 +28,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SuperAdminLogin from './features/superadmin/pages/SuperAdminLogin';
 import SuperAdminLayout from './features/superadmin/components/SuperAdminLayout';
 import SuperAdminDashboard from './features/superadmin/pages/SuperAdminDashboard';
+import SuperAdminCompanies from './features/superadmin/pages/SuperAdminCompanies';
+import SuperAdminSubscriptions from './features/superadmin/pages/SuperAdminSubscriptions';
+import SuperAdminPlans from './features/superadmin/pages/SuperAdminPlans';
+import SuperAdminStats from './features/superadmin/pages/SuperAdminStats';
+import SuperAdminConfig from './features/superadmin/pages/SuperAdminConfig';
+import SuperAdminAudit from './features/superadmin/pages/SuperAdminAudit';
 import SuperAdminProtectedRoute from './components/SuperAdminProtectedRoute';
 
 function App() {
@@ -113,7 +119,12 @@ function App() {
             }
           >
             <Route path="dashboard" element={<SuperAdminDashboard />} />
-            {/* Rutas futuras: companies, subscriptions, plans, stats, settings, audit */}
+            <Route path="companies" element={<SuperAdminCompanies />} />
+            <Route path="subscriptions" element={<SuperAdminSubscriptions />} />
+            <Route path="plans" element={<SuperAdminPlans />} />
+            <Route path="stats" element={<SuperAdminStats />} />
+            <Route path="settings" element={<SuperAdminConfig />} />
+            <Route path="audit" element={<SuperAdminAudit />} />
           </Route>
 
         </Routes>
