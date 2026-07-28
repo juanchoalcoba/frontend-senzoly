@@ -271,12 +271,13 @@ export default function EmployeesPage() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[90vh]">
+            {/* Header fijo */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
               <h2 className="text-xl font-bold text-slate-900">
                 {isLimitReached ? 'Límite alcanzado' : (editingEmployee ? 'Editar Empleado' : 'Nuevo Empleado')}
               </h2>
-              <button onClick={closeModal} className="text-slate-400 hover:text-slate-600">
+              <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -299,14 +300,15 @@ export default function EmployeesPage() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="p-6">
-                {formError && (
-                  <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg">
-                    {formError}
-                  </div>
-                )}
-                
-                <div className="space-y-4">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                {/* Cuerpo scrolleable */}
+                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+                  {formError && (
+                    <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+                      {formError}
+                    </div>
+                  )}
+                  
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Nombre *</label>
@@ -315,7 +317,7 @@ export default function EmployeesPage() {
                         required
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
-                        className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -325,29 +327,30 @@ export default function EmployeesPage() {
                         required
                         value={formData.lastName}
                         onChange={e => setFormData({...formData, lastName: e.target.value})}
-                        className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       />
                     </div>
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                    <input 
-                      type="email" 
-                      value={formData.email}
-                      onChange={e => setFormData({...formData, email: e.target.value})}
-                      className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
-                    <input 
-                      type="tel" 
-                      value={formData.phone}
-                      onChange={e => setFormData({...formData, phone: e.target.value})}
-                      className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                      <input 
+                        type="email" 
+                        value={formData.email}
+                        onChange={e => setFormData({...formData, email: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+                      <input 
+                        type="tel" 
+                        value={formData.phone}
+                        onChange={e => setFormData({...formData, phone: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -355,7 +358,7 @@ export default function EmployeesPage() {
                     <select
                       value={formData.active ? 'active' : 'inactive'}
                       onChange={e => setFormData({ ...formData, active: e.target.value === 'active' })}
-                      className="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
                       <option value="active">Activo</option>
                       <option value="inactive">Inactivo</option>
@@ -368,14 +371,16 @@ export default function EmployeesPage() {
                       <select
                         value={formData.commissionType}
                         onChange={e => setFormData({ ...formData, commissionType: e.target.value })}
-                        className="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       >
-                        <option value="percentage">Porcentaje</option>
-                        <option value="fixed">Fijo</option>
+                        <option value="percentage">Porcentaje (%)</option>
+                        <option value="fixed">Monto fijo ($)</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Valor de la comisión</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Valor {formData.commissionType === 'percentage' ? '(%)' : '($)'}
+                      </label>
                       <input
                         type="number"
                         min="0"
@@ -384,7 +389,7 @@ export default function EmployeesPage() {
                         required
                         value={formData.commissionValue}
                         onChange={e => setFormData({ ...formData, commissionValue: e.target.value })}
-                        className="w-full p-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -392,13 +397,13 @@ export default function EmployeesPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Servicios asignados</label>
                     {services.length === 0 ? (
-                      <p className="p-3 text-sm text-slate-500 border border-slate-200 rounded-lg">
+                      <p className="px-3 py-2.5 text-sm text-slate-500 border border-slate-200 rounded-lg">
                         No hay servicios disponibles para asignar.
                       </p>
                     ) : (
-                      <div className="max-h-36 overflow-y-auto rounded-lg border border-slate-200 divide-y divide-slate-100">
+                      <div className="max-h-32 overflow-y-auto rounded-lg border border-slate-200 divide-y divide-slate-100">
                         {services.map((service) => (
-                          <label key={service.id} className="flex items-center gap-3 p-3 text-sm text-slate-700 cursor-pointer hover:bg-slate-50">
+                          <label key={service.id} className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 cursor-pointer hover:bg-slate-50">
                             <input
                               type="checkbox"
                               checked={formData.serviceIds.includes(service.id)}
@@ -417,19 +422,20 @@ export default function EmployeesPage() {
                     )}
                   </div>
                 </div>
-                
-                <div className="mt-8 flex gap-3">
+
+                {/* Footer fijo con botones */}
+                <div className="px-6 py-4 border-t border-slate-100 flex gap-3 shrink-0">
                   <button 
                     type="button"
                     onClick={closeModal}
-                    className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-lg font-medium hover:bg-slate-50 transition-colors"
+                    className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button 
                     type="submit"
                     disabled={formLoading}
-                    className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2.5 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
                   >
                     {formLoading ? 'Guardando...' : 'Guardar'}
                   </button>
