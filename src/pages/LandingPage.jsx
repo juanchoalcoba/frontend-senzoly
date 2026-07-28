@@ -1,6 +1,5 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
-import MobileNav from '../components/MobileNav';
 import Hero from '../components/Hero';
 import AboutSection from '../components/AboutSection';
 import PricingSection from '../components/PricingSection';
@@ -18,7 +17,6 @@ export default function LandingPage() {
         <CtaSection />
       </main>
       <Footer />
-      <MobileNav />
     </div>
   );
 }

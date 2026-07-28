@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Quote, Scissors, Sparkles, Stethoscope, Trophy, Star, ArrowRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const stories = [
@@ -32,7 +31,6 @@ export default function SuccessStoriesPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
-      <MobileNav />
       <main>
         <section className="relative overflow-hidden bg-white py-20 sm:py-24">
           <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-orange-100/70 blur-3xl" />

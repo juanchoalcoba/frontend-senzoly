@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarDays, ChartNoAxesCombined, ClipboardList, Rocket, Settings2, Share2, UserPlus } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const steps = [
@@ -18,7 +17,6 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
-      <MobileNav />
       <main>
         <section className="relative overflow-hidden bg-white py-20 sm:py-24">
           <div className="absolute -left-24 top-12 h-72 w-72 rounded-full bg-orange-100/70 blur-3xl" />
