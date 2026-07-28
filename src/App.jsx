@@ -20,6 +20,7 @@ import ServicesPage from './features/dashboard/pages/ServicesPage';
 import SettingsPage from './features/dashboard/pages/SettingsPage';
 import BookingsPage from './features/dashboard/pages/BookingsPage';
 import PublicBookingPage from './features/public/pages/PublicBookingPage';
+import ProfessionalPortalPage from './features/public/pages/ProfessionalPortalPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -105,8 +106,9 @@ function App() {
             }
           />
 
-          {/* ─── Portal Público de Reservas ─── */}
+          {/* ─── Portal Público de Reservas y Portal Profesional ─── */}
           <Route path="/reserva/:slug" element={<PublicBookingPage />} />
+          <Route path="/p/:token" element={<ProfessionalPortalPage />} />
 
           {/* ─── Portal Super Admin ─── */}
           <Route path="/super-admin/login" element={<SuperAdminLogin />} />

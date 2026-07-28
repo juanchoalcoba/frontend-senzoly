@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
-import { getEmployees, createEmployee, updateEmployee, deleteEmployee } from '../services/employeeApi';
+import { getEmployees, createEmployee, updateEmployee, deleteEmployee, regenerateEmployeeToken } from '../services/employeeApi';
 import { getServices } from '../services/serviceCatalogApi';
 import { useAuth } from '../../../context/AuthContext';
-import { Plus, Edit2, Trash2, X, Lock } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Lock, Link, RefreshCw, Check } from 'lucide-react';
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -146,13 +147,32 @@ export default function EmployeesPage() {
     }
   };
 
+  const handleCopyPortalLink = (empToken, empId) => {
+    const portalUrl = `${window.location.origin}/p/${empToken}`;
+    navigator.clipboard.writeText(portalUrl);
+    setCopiedId(empId);
+    setTimeout(() => setCopiedId(null), 2500);
+  };
+
+  const handleRegenerateToken = async (employee) => {
+    if (window.confirm(`¿Confirmas que deseas regenerar el enlace de portal para ${employee.first_name}? El enlace anterior dejará de funcionar inmediatamente.`)) {
+      try {
+        const updated = await regenerateEmployeeToken(token, employee.id);
+        await loadEmployees();
+        alert(`Nuevo enlace generado. Puedes copiarlo desde la lista de acciones.`);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto">
         <header className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Empleados</h1>
-            <p className="text-slate-500 mt-1">Gestiona el personal de tu negocio</p>
+            <p className="text-slate-500 mt-1">Gestiona el personal de tu negocio y sus accesos al portal</p>
           </div>
           <button 
             onClick={() => openModal()}
@@ -206,6 +226,24 @@ export default function EmployeesPage() {
                         </button>
                       </td>
                       <td className="p-4 text-right space-x-2">
+                        {emp.portal_token && (
+                          <>
+                            <button
+                              onClick={() => handleCopyPortalLink(emp.portal_token, emp.id)}
+                              className={`p-2 rounded-lg transition-colors ${copiedId === emp.id ? 'text-green-600 bg-green-50' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
+                              title={copiedId === emp.id ? '¡Copiado!' : 'Copiar enlace al portal del profesional'}
+                            >
+                              {copiedId === emp.id ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
+                            </button>
+                            <button
+                              onClick={() => handleRegenerateToken(emp)}
+                              className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                              title="Regenerar enlace de acceso"
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
                         <button 
                           onClick={() => openModal(emp)}
                           className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

@@ -45,3 +45,13 @@ export const deleteEmployee = async (token, id) => {
   if (!data.success) throw new Error(data.message);
   return data.data;
 };
+
+export const regenerateEmployeeToken = async (token, id) => {
+  const res = await fetch(`${API_URL}/employees/${id}/regenerate-token`, {
+    method: 'POST',
+    headers: getHeaders(token)
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
