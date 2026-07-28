@@ -81,7 +81,7 @@ export default function PublicBookingPage() {
   }, [selectedService, slug]);
 
   useEffect(() => {
-    if (!selectedService || !selectedProfessional || !selectedDate) {
+    if (!selectedService || !selectedDate) {
       setSlots([]);
       setSelectedSlot('');
       return;
@@ -95,7 +95,7 @@ export default function PublicBookingPage() {
         const data = await getAvailableSlots(
           slug,
           selectedService.id,
-          selectedProfessional.id,
+            selectedProfessional?.id,
           selectedDate
         );
         setSlots(data);
@@ -137,7 +137,7 @@ export default function PublicBookingPage() {
     try {
       const result = await createPublicBooking(slug, {
         serviceId: selectedService.id,
-        employeeId: selectedProfessional.id,
+        employeeId: selectedProfessional?.id,
         bookingDate: selectedDate,
         startTime: selectedSlot,
         customer: customerForm,
@@ -312,8 +312,8 @@ export default function PublicBookingPage() {
             ) : professionals.length === 0 ? (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-slate-400">
                 <User className="w-8 h-8 mx-auto mb-3 text-slate-600" />
-                <p className="text-white font-semibold">No hay profesionales disponibles</p>
-                <p className="text-sm mt-1">Actualmente no hay profesionales asignados a este servicio.</p>
+                <p className="text-white font-semibold">Reserva sin profesional</p>
+                <p className="text-sm mt-1">Este servicio se reservará directamente según el horario general del negocio.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -354,7 +354,7 @@ export default function PublicBookingPage() {
               </button>
               <button
                 onClick={() => setStep(2)}
-                disabled={!selectedProfessional || professionalsLoading}
+                disabled={professionalsLoading}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm disabled:opacity-40 transition-all"
               >
                 Continuar <ChevronRight className="w-4 h-4" />
@@ -364,7 +364,7 @@ export default function PublicBookingPage() {
         )}
 
         {/* PASO 2: FECHA Y HORA */}
-        {step === 2 && selectedService && selectedProfessional && (
+        {step === 2 && selectedService && (
           <div className="space-y-5">
             {/* Selected service summary */}
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-center justify-between">

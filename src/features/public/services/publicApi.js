@@ -8,7 +8,8 @@ export const getTenantBySlug = async (slug) => {
 };
 
 export const getAvailableSlots = async (slug, serviceId, employeeId, date) => {
-  const params = new URLSearchParams({ serviceId, employeeId, date });
+  const params = new URLSearchParams({ serviceId, date });
+  if (employeeId) params.set('employeeId', employeeId);
   const res = await fetch(`${API_URL}/public/tenant/${slug}/slots?${params.toString()}`);
   const data = await res.json();
   if (!data.success) throw new Error(data.message);
