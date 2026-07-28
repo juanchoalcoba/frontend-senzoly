@@ -3,6 +3,26 @@ import { useParams } from 'react-router-dom';
 import { getStaffPortalData, updateStaffBookingStatus } from '../services/staffPortalApi';
 import { Clock, Phone, Play, CheckCircle2, Calendar, User, RefreshCw, AlertCircle } from 'lucide-react';
 
+// Formatea 'YYYY-MM-DD' → 'Martes 29 de julio'
+const formatBookingDate = (dateStr) => {
+  if (!dateStr) return '';
+  // Parsear sin conversión de zona horaria
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+};
+
+// Agrupa un array de bookings por booking_date
+const groupByDate = (bookings) => {
+  const groups = {};
+  bookings.forEach((b) => {
+    const key = b.booking_date ? b.booking_date.slice(0, 10) : 'sin-fecha';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(b);
+  });
+  return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+};
+
 export default function ProfessionalPortalPage() {
   const { token } = useParams();
   const [data, setData] = useState(null);
@@ -100,9 +120,9 @@ export default function ProfessionalPortalPage() {
       {/* Main Content */}
       <main className="flex-1 p-5 space-y-4">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Mis Turnos Asignados</h2>
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Mi Agenda</h2>
           <span className="text-xs bg-indigo-500/20 text-indigo-300 font-medium px-2.5 py-0.5 rounded-full">
-            {bookings.length} {bookings.length === 1 ? 'reserva' : 'reservas'}
+            {bookings.length} {bookings.length === 1 ? 'turno' : 'turnos'}
           </span>
         </div>
 
@@ -113,8 +133,24 @@ export default function ProfessionalPortalPage() {
             <p className="text-xs text-slate-500 mt-1">No tienes turnos programados en este momento.</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {bookings.map((booking) => {
+          <div className="space-y-6">
+            {groupByDate(bookings).map(([dateKey, dayBookings]) => (
+              <div key={dateKey}>
+                {/* Separador de fecha */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-2 bg-slate-800/70 px-3 py-1.5 rounded-xl border border-slate-700/50">
+                    <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="text-xs font-semibold text-slate-200 capitalize">
+                      {formatBookingDate(dateKey)}
+                    </span>
+                  </div>
+                  <span className="text-xs text-slate-500">
+                    {dayBookings.length} {dayBookings.length === 1 ? 'turno' : 'turnos'}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+            {dayBookings.map((booking) => {
               const isUpdating = updatingId === booking.id;
               const cleanPhone = booking.customer_phone ? booking.customer_phone.replace(/[^0-9]/g, '') : null;
 
@@ -222,8 +258,12 @@ export default function ProfessionalPortalPage() {
                 </div>
               );
             })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
+
       </main>
 
       {/* Footer Mobile */}
