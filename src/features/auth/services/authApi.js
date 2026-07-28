@@ -1,5 +1,12 @@
 import { API_URL } from '../../../config/api';
 
+const createApiError = (data, fallbackMessage) => {
+  const error = new Error(data.message || fallbackMessage);
+  error.code = data.errors?.[0]?.code;
+  error.tenantStatus = data.errors?.[0]?.status;
+  return error;
+};
+
 export const fetchBusinessTypes = async () => {
   const res = await fetch(`${API_URL}/catalogs/business-types`);
   const data = await res.json();
@@ -54,7 +61,7 @@ export const login = async (credentials) => {
     body: JSON.stringify(credentials),
   });
   const data = await res.json();
-  if (!data.success) throw new Error(data.message || 'Error al iniciar sesión');
+  if (!data.success) throw createApiError(data, 'Error al iniciar sesión');
   return data.data; // Retorna { token, user }
 };
 
@@ -63,7 +70,7 @@ export const fetchMe = async (token) => {
     headers: { 'Authorization': `Bearer ${token}` }
   });
   const data = await res.json();
-  if (!data.success) throw new Error(data.message || 'Error al obtener datos del usuario');
+  if (!data.success) throw createApiError(data, 'Error al obtener datos del usuario');
   return data.data; // Retorna { user, tenant, subscription }
 };
 
@@ -93,5 +100,41 @@ export const getSuperAdminTenants = async (token) => {
   });
   const data = await res.json();
   if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
+export const getSuperAdminTenant = async (token, tenantId) => {
+  const res = await fetch(`${API_URL}/super-admin/tenants/${tenantId}`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!data.success) throw createApiError(data, 'Error al obtener empresa');
+  return data.data;
+};
+
+export const suspendSuperAdminTenant = async (token, tenantId) => {
+  const res = await fetch(`${API_URL}/super-admin/tenants/${tenantId}/suspend`, {
+    method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!data.success) throw createApiError(data, 'Error al suspender empresa');
+  return data.data;
+};
+
+export const reactivateSuperAdminTenant = async (token, tenantId) => {
+  const res = await fetch(`${API_URL}/super-admin/tenants/${tenantId}/reactivate`, {
+    method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!data.success) throw createApiError(data, 'Error al reactivar empresa');
+  return data.data;
+};
+
+export const deleteSuperAdminTenant = async (token, tenantId) => {
+  const res = await fetch(`${API_URL}/super-admin/tenants/${tenantId}`, {
+    method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!data.success) throw createApiError(data, 'Error al eliminar empresa');
   return data.data;
 };

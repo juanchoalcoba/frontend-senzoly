@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProtectedRoute({ children }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isTenantSuspended } = useAuth();
 
   if (isLoading) {
     return (
@@ -14,6 +14,9 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!user) {
+    if (isTenantSuspended) {
+      return <Navigate to="/account-suspended" replace />;
+    }
     return <Navigate to="/login" replace />;
   }
 

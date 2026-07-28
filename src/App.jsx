@@ -12,6 +12,7 @@ import RegisterPage from './features/auth/pages/RegisterPage';
 import VerifyEmailPage from './features/auth/pages/VerifyEmailPage';
 import ForgotPasswordPage from './features/auth/pages/ForgotPasswordPage';
 import ResetPasswordPage from './features/auth/pages/ResetPasswordPage';
+import TenantSuspendedPage from './features/auth/pages/TenantSuspendedPage';
 import DashboardPage from './features/dashboard/pages/DashboardPage';
 import EmployeesPage from './features/dashboard/pages/EmployeesPage';
 import CustomersPage from './features/dashboard/pages/CustomersPage';
@@ -43,6 +44,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/account-suspended" element={<TenantSuspendedPage />} />
           <Route
             path="/dashboard"
             element={

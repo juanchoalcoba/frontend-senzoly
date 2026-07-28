@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
-import { getSuperAdminStats, getSuperAdminTenants } from '../../auth/services/authApi';
+import {
+  deleteSuperAdminTenant,
+  getSuperAdminStats,
+  getSuperAdminTenant,
+  getSuperAdminTenants,
+  reactivateSuperAdminTenant,
+  suspendSuperAdminTenant,
+} from '../../auth/services/authApi';
 import { 
   Building2, Users, CreditCard, Activity, 
   Search, Filter, MoreVertical, Eye, Power, PowerOff, Trash2
@@ -13,6 +20,8 @@ export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null);
   const [tenants, setTenants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTenant, setSelectedTenant] = useState(null);
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +41,41 @@ export default function SuperAdminDashboard() {
     
     if (token) fetchData();
   }, [token]);
+
+  const openTenant = async (tenantId) => {
+    try {
+      setActionError('');
+      setSelectedTenant(await getSuperAdminTenant(token, tenantId));
+    } catch (error) {
+      setActionError(error.message);
+    }
+  };
+
+  const changeTenantStatus = async (tenant, action) => {
+    const labels = { suspend: 'suspender', reactivate: 'reactivar', delete: 'eliminar' };
+    if (!window.confirm(`¿Confirmas que deseas ${labels[action]} ${tenant.name}?`)) return;
+
+    try {
+      setActionError('');
+      const operations = {
+        suspend: suspendSuperAdminTenant,
+        reactivate: reactivateSuperAdminTenant,
+        delete: deleteSuperAdminTenant,
+      };
+      const updated = await operations[action](token, tenant.id);
+      if (action === 'delete') {
+        setTenants((current) => current.filter((item) => item.id !== tenant.id));
+        setSelectedTenant(null);
+        return;
+      }
+      setTenants((current) => current.map((item) => (
+        item.id === tenant.id ? { ...item, ...updated } : item
+      )));
+      setSelectedTenant((current) => current?.id === tenant.id ? { ...current, ...updated } : current);
+    } catch (error) {
+      setActionError(error.message);
+    }
+  };
 
   const kpis = [
     { name: 'Empresas Registradas', value: stats?.totalTenants || 0, icon: Building2, color: 'text-blue-600', bg: 'bg-blue-100' },
@@ -54,6 +98,12 @@ export default function SuperAdminDashboard() {
         <h1 className="text-2xl font-bold text-slate-900">Bienvenido, {user?.firstName}</h1>
         <p className="text-slate-500">Resumen general de la plataforma Senzoly.</p>
       </div>
+
+      {actionError && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {actionError}
+        </div>
+      )}
 
       {/* KPIs Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -96,7 +146,9 @@ export default function SuperAdminDashboard() {
                 <th className="px-6 py-4 font-medium">Empresa</th>
                 <th className="px-6 py-4 font-medium">Administrador</th>
                 <th className="px-6 py-4 font-medium">Plan</th>
+                <th className="px-6 py-4 font-medium">Tipo</th>
                 <th className="px-6 py-4 font-medium">Estado</th>
+                <th className="px-6 py-4 font-medium">Actividad</th>
                 <th className="px-6 py-4 font-medium">Registro</th>
                 <th className="px-6 py-4 font-medium text-right">Acciones</th>
               </tr>
@@ -117,25 +169,39 @@ export default function SuperAdminDashboard() {
                       {tenant.plan_name || 'Trial'}
                     </span>
                   </td>
+                  <td className="px-6 py-4 text-sm text-slate-600">
+                    {tenant.business_type_name || 'Sin tipo'}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      tenant.subscription_status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 
-                      tenant.subscription_status === 'SUSPENDED' ? 'bg-red-100 text-red-800' :
+                      tenant.status === 'active' ? 'bg-green-100 text-green-800' :
+                      tenant.status === 'suspended' ? 'bg-red-100 text-red-800' :
                       'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {tenant.subscription_status || 'TRIAL'}
+                      {tenant.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 text-xs text-slate-500">
+                    <div>{tenant.bookings_count} reservas · {tenant.customers_count} clientes</div>
+                    <div>{tenant.last_login_at ? `Último acceso: ${new Date(tenant.last_login_at).toLocaleDateString()}` : 'Sin accesos'}</div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(tenant.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Ver Empresa">
+                      <button onClick={() => openTenant(tenant.id)} className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Ver Empresa">
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Suspender">
-                        <PowerOff className="w-4 h-4" />
+                      <button
+                        onClick={() => changeTenantStatus(tenant, tenant.status === 'suspended' ? 'reactivate' : 'suspend')}
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title={tenant.status === 'suspended' ? 'Reactivar' : 'Suspender'}
+                      >
+                        {tenant.status === 'suspended' ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
+                      </button>
+                      <button onClick={() => changeTenantStatus(tenant, 'delete')} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+                        <Trash2 className="w-4 h-4" />
                       </button>
                       <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <MoreVertical className="w-4 h-4" />
@@ -147,7 +213,7 @@ export default function SuperAdminDashboard() {
               
               {tenants.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan="8" className="px-6 py-8 text-center text-slate-500">
                     No hay empresas registradas aún.
                   </td>
                 </tr>
@@ -156,6 +222,29 @@ export default function SuperAdminDashboard() {
           </table>
         </div>
       </div>
+
+      {selectedTenant && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4" onClick={() => setSelectedTenant(null)}>
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">{selectedTenant.name}</h2>
+                <p className="text-sm text-slate-500">/{selectedTenant.slug}</p>
+              </div>
+              <button onClick={() => setSelectedTenant(null)} className="text-sm text-slate-500 hover:text-slate-900">Cerrar</button>
+            </div>
+            <dl className="grid grid-cols-2 gap-4 text-sm">
+              <div><dt className="text-slate-500">Estado</dt><dd className="font-medium">{selectedTenant.status}</dd></div>
+              <div><dt className="text-slate-500">Plan</dt><dd className="font-medium">{selectedTenant.plan_name || 'Sin plan'}</dd></div>
+              <div><dt className="text-slate-500">Tipo de cuenta</dt><dd className="font-medium">{selectedTenant.business_type_name}</dd></div>
+              <div><dt className="text-slate-500">Registro</dt><dd className="font-medium">{new Date(selectedTenant.created_at).toLocaleDateString()}</dd></div>
+              <div><dt className="text-slate-500">Reservas</dt><dd className="font-medium">{selectedTenant.bookings_count}</dd></div>
+              <div><dt className="text-slate-500">Clientes</dt><dd className="font-medium">{selectedTenant.customers_count}</dd></div>
+              <div className="col-span-2"><dt className="text-slate-500">Último acceso</dt><dd className="font-medium">{selectedTenant.last_login_at ? new Date(selectedTenant.last_login_at).toLocaleString() : 'Sin accesos registrados'}</dd></div>
+            </dl>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

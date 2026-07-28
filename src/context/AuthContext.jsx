@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [tenant, setTenant] = useState(null);
   const [subscription, setSubscription] = useState(null);
+  const [isTenantSuspended, setIsTenantSuspended] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }) => {
             console.error('Error al cargar sesión:', error);
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            setIsTenantSuspended(error.code === 'TENANT_UNAVAILABLE' && error.tenantStatus === 'suspended');
           }
         }
       }
@@ -39,8 +41,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const data = await apiLogin(credentials);
+    let data;
+    try {
+      data = await apiLogin(credentials);
+    } catch (error) {
+      setIsTenantSuspended(error.code === 'TENANT_UNAVAILABLE' && error.tenantStatus === 'suspended');
+      throw error;
+    }
     localStorage.setItem('token', data.token);
+    setIsTenantSuspended(false);
     
     // Obtener los datos completos del tenant tras loguearse
     try {
@@ -51,6 +60,12 @@ export const AuthProvider = ({ children }) => {
       setSubscription(meData.subscription);
       return meData;
     } catch (error) {
+      if (error.code === 'TENANT_UNAVAILABLE') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsTenantSuspended(error.tenantStatus === 'suspended');
+        throw error;
+      }
       // Si falla obtener los detalles, seteamos al menos lo básico
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
@@ -73,10 +88,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setTenant(null);
     setSubscription(null);
+    setIsTenantSuspended(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, tenant, subscription, isLoading, login, loginSuperAdmin, logout }}>
+    <AuthContext.Provider value={{ user, tenant, subscription, isLoading, isTenantSuspended, login, loginSuperAdmin, logout }}>
       {children}
     </AuthContext.Provider>
   );

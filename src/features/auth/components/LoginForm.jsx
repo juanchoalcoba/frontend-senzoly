@@ -20,6 +20,10 @@ export default function LoginForm() {
       await login(formData);
       navigate('/dashboard'); // Redirigir al dashboard tras el login
     } catch (err) {
+      if (err.code === 'TENANT_UNAVAILABLE' && err.tenantStatus === 'suspended') {
+        navigate('/account-suspended', { replace: true });
+        return;
+      }
       setErrorMsg(err.message);
     } finally {
       setIsLoading(false);
