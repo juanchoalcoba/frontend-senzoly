@@ -20,6 +20,8 @@ import ServicesPage from './features/dashboard/pages/ServicesPage';
 import SettingsPage from './features/dashboard/pages/SettingsPage';
 import BookingsPage from './features/dashboard/pages/BookingsPage';
 import PublicBookingPage from './features/public/pages/PublicBookingPage';
+import SuccessStoriesPage from './pages/SuccessStoriesPage';
+import HowItWorksPage from './pages/HowItWorksPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Portal Super Admin
@@ -39,6 +41,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/casos-de-exito" element={<SuccessStoriesPage />} />
+          <Route path="/como-funciona" element={<HowItWorksPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />

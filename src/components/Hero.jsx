@@ -253,7 +253,7 @@ export default function Hero() {
                     />
                   </svg>
                 </Link>
-                <button className="bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2">
+                <Link to="/como-funciona" className="bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2">
                   Ver cómo funciona
                   <svg
                     className="w-5 h-5 text-slate-700"
@@ -262,7 +262,7 @@ export default function Hero() {
                   >
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                </button>
+                </Link>
               </div>
 
               {/* Redes Sociales */}

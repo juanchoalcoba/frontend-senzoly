@@ -36,12 +36,12 @@ export default function Navbar() {
             >
               Precios
             </a>
-            <a
-              href="#casos"
+            <Link
+              to="/casos-de-exito"
               className="text-slate-600 font-medium text-sm hover:text-slate-900 transition-colors"
             >
               Casos de éxito
-            </a>
+            </Link>
             <div className="relative group flex items-center cursor-pointer">
               <span className="text-slate-600 font-medium text-sm hover:text-slate-900 transition-colors">
                 Recursos
