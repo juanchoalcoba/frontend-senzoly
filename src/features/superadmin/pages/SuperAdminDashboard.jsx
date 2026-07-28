@@ -10,7 +10,7 @@ import {
 } from '../../auth/services/authApi';
 import { 
   Building2, Users, CreditCard, Activity, 
-  Search, Filter, MoreVertical, Eye, Power, PowerOff, Trash2
+  Search, Filter, Eye, Power, PowerOff, Trash2
 } from 'lucide-react';
 
 export default function SuperAdminDashboard() {
@@ -148,7 +148,6 @@ export default function SuperAdminDashboard() {
                 <th className="px-6 py-4 font-medium">Plan</th>
                 <th className="px-6 py-4 font-medium">Tipo</th>
                 <th className="px-6 py-4 font-medium">Estado</th>
-                <th className="px-6 py-4 font-medium">Actividad</th>
                 <th className="px-6 py-4 font-medium">Registro</th>
                 <th className="px-6 py-4 font-medium text-right">Acciones</th>
               </tr>
@@ -181,10 +180,6 @@ export default function SuperAdminDashboard() {
                       {tenant.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-xs text-slate-500">
-                    <div>{tenant.bookings_count} reservas · {tenant.customers_count} clientes</div>
-                    <div>{tenant.last_login_at ? `Último acceso: ${new Date(tenant.last_login_at).toLocaleDateString()}` : 'Sin accesos'}</div>
-                  </td>
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(tenant.created_at).toLocaleDateString()}
                   </td>
@@ -203,9 +198,6 @@ export default function SuperAdminDashboard() {
                       <button onClick={() => changeTenantStatus(tenant, 'delete')} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
                         <Trash2 className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
                     </div>
                   </td>
                 </tr>
@@ -213,7 +205,7 @@ export default function SuperAdminDashboard() {
               
               {tenants.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan="7" className="px-6 py-8 text-center text-slate-500">
                     No hay empresas registradas aún.
                   </td>
                 </tr>
