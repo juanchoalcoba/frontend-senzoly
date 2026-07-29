@@ -8,7 +8,7 @@ import {
   getFinancialMovements,
 } from '../services/financeApi';
 import { getEmployees } from '../services/employeeApi';
-import { getServices } from '../services/serviceApi';
+import { getServices } from '../services/serviceCatalogApi';
 
 import FinanceOverviewCards from '../components/finance/FinanceOverviewCards';
 import FinanceChart from '../components/finance/FinanceChart';
