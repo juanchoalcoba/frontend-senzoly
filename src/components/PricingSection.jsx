@@ -25,7 +25,7 @@ const plans = [
     icon: Gift,
   },
   {
-    name: "Solo",
+    name: "Individual",
     price: "$1.490 / mes",
     description: "Para profesionales independientes.",
     features: [
@@ -47,7 +47,7 @@ const plans = [
     price: "$2.490 / mes",
     description: "Perfecto para pequeños equipos.",
     features: [
-      "Todo lo de Solo",
+      "Todo lo de Individual",
       "Hasta 7 empleados",
       "Agenda por empleado",
       "Panel administrador",

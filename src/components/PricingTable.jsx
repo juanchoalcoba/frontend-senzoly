@@ -29,7 +29,7 @@ export default function PricingTable() {
                 Prueba
               </th>
               <th className="py-4 px-6 text-sm font-semibold text-slate-900 border-b border-slate-200 text-center">
-                Solo
+                Individual
               </th>
               <th className="py-4 px-6 text-sm font-bold text-[#FF6B00] border-b-2 border-[#FF6B00] text-center">
                 Equipo
@@ -55,7 +55,7 @@ export default function PricingTable() {
                   )}
                 </td>
                 
-                {/* Solo */}
+                {/* Individual */}
                 <td className="py-4 px-6 text-sm text-slate-600 text-center">
                   {typeof feat.solo === 'boolean' ? (
                     feat.solo ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <X className="w-5 h-5 text-slate-300 mx-auto" />
