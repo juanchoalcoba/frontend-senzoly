@@ -15,11 +15,14 @@ import FinanceChart from '../components/finance/FinanceChart';
 import EmployeeRankingTable from '../components/finance/EmployeeRankingTable';
 import FinanceMovementsTable from '../components/finance/FinanceMovementsTable';
 import EmployeeDetailModal from '../components/finance/EmployeeDetailModal';
+import ExpenseModal from '../components/finance/ExpenseModal';
+import EmployeePayoutModal from '../components/finance/EmployeePayoutModal';
+import ExportButtons from '../components/finance/ExportButtons';
 
-import { Calendar, RefreshCw, Filter } from 'lucide-react';
+import { RefreshCw, PlusCircle, HandCoins } from 'lucide-react';
 
 export default function FinancePage() {
-  const { token } = useAuth();
+  const { token, tenant } = useAuth();
 
   // Filtros de fecha
   const [period, setPeriod] = useState('month'); // 'today' | 'week' | 'month' | 'year' | 'custom'
@@ -44,8 +47,11 @@ export default function FinancePage() {
     paymentMethod: '',
   });
 
-  // Modal detalle de empleado
+  // Modales
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
+  const [payoutEmployeeId, setPayoutEmployeeId] = useState(null);
 
   // Loadings
   const [loadingOverview, setLoadingOverview] = useState(true);
@@ -150,12 +156,38 @@ export default function FinancePage() {
           <div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Módulo Financiero</h1>
             <p className="text-slate-500 text-sm mt-0.5">
-              Análisis y balance consolidado del negocio a partir de servicios completados
+              Análisis, control de caja, egresos y liquidaciones del negocio
             </p>
           </div>
 
-          {/* Barra de Filtro de Período */}
-          <div className="flex flex-wrap items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+          {/* Acciones & Botones */}
+          <div className="flex flex-wrap items-center gap-3">
+            <ExportButtons movements={movementsData} overview={overviewData?.overview} tenantName={tenant?.name} />
+
+            <button
+              onClick={() => setIsExpenseModalOpen(true)}
+              className="flex items-center gap-2 px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl text-xs font-bold transition-colors shadow-sm"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>Registrar Gasto</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setPayoutEmployeeId(null);
+                setIsPayoutModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-colors shadow-md shadow-blue-600/20"
+            >
+              <HandCoins className="w-4 h-4" />
+              <span>Liquidar Empleado</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Barra de Filtro de Período */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex flex-wrap items-center gap-1.5">
             {[
               { id: 'today', label: 'Hoy' },
               { id: 'week', label: 'Semana' },
@@ -175,15 +207,16 @@ export default function FinancePage() {
                 {p.label}
               </button>
             ))}
-
-            <button
-              onClick={loadFinancialData}
-              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl transition-colors ml-1"
-              title="Actualizar datos"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
           </div>
+
+          <button
+            onClick={loadFinancialData}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:text-slate-900 text-xs font-medium rounded-xl transition-colors"
+            title="Actualizar datos"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Actualizar</span>
+          </button>
         </div>
 
         {/* Inputs de Rango Personalizado */}
@@ -251,6 +284,26 @@ export default function FinancePage() {
           startDate={startDate}
           endDate={endDate}
           onClose={() => setSelectedEmployeeId(null)}
+        />
+      )}
+
+      {/* Modal Registro de Gasto / Egreso */}
+      {isExpenseModalOpen && (
+        <ExpenseModal
+          token={token}
+          onSuccess={loadFinancialData}
+          onClose={() => setIsExpenseModalOpen(false)}
+        />
+      )}
+
+      {/* Modal Liquidación a Empleados */}
+      {isPayoutModalOpen && (
+        <EmployeePayoutModal
+          token={token}
+          employees={employeesList}
+          initialEmployeeId={payoutEmployeeId}
+          onSuccess={loadFinancialData}
+          onClose={() => setIsPayoutModalOpen(false)}
         />
       )}
     </DashboardLayout>

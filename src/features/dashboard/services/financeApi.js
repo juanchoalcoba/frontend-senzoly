@@ -65,3 +65,35 @@ export const getFinancialMovements = async (token, params = {}) => {
   if (!data.success) throw new Error(data.message);
   return data.data;
 };
+
+export const createExpense = async (token, expenseData) => {
+  const res = await fetch(`${API_URL}/financial/expenses`, {
+    method: 'POST',
+    headers: getHeaders(token),
+    body: JSON.stringify(expenseData),
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
+export const createEmployeePayout = async (token, payoutData) => {
+  const res = await fetch(`${API_URL}/financial/payouts`, {
+    method: 'POST',
+    headers: getHeaders(token),
+    body: JSON.stringify(payoutData),
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
+export const getEmployeePayouts = async (token, params = {}) => {
+  const qs = buildQueryString(params);
+  const res = await fetch(`${API_URL}/financial/payouts${qs}`, {
+    headers: getHeaders(token),
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
