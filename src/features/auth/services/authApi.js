@@ -138,3 +138,22 @@ export const deleteSuperAdminTenant = async (token, tenantId) => {
   if (!data.success) throw createApiError(data, 'Error al eliminar empresa');
   return data.data;
 };
+
+export const getSuperAdminSubscriptions = async (token) => {
+  const res = await fetch(`${API_URL}/super-admin/subscriptions`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!data.success) throw createApiError(data, 'Error al obtener suscripciones');
+  return data.data;
+};
+
+export const getSuperAdminPlans = async (token) => {
+  const res = await fetch(`${API_URL}/super-admin/plans`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!data.success) throw createApiError(data, 'Error al obtener planes');
+  return data.data;
+};
+
