@@ -101,17 +101,23 @@ export default function FinancePage() {
     }
   }, [token]);
 
+  const [apiError, setApiError] = useState(null);
+
   // Carga datos financieros principales
   const loadFinancialData = useCallback(async () => {
     if (!token) return;
 
     const { startDate, endDate } = getDateRange();
+    setApiError(null);
 
     // 1. Resumen y KPIs
     setLoadingOverview(true);
     getFinancialOverview(token, { startDate, endDate })
       .then(setOverviewData)
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        setApiError(err.message || 'Error al conectar con la base de datos de finanzas');
+      })
       .finally(() => setLoadingOverview(false));
 
     // 2. Gráfico
@@ -239,6 +245,20 @@ export default function FinancePage() {
                 onChange={(e) => setCustomEndDate(e.target.value)}
                 className="px-3 py-1.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
+            </div>
+          </div>
+        )}
+
+        {/* Aviso de Error en la API / Base de Datos */}
+        {apiError && (
+          <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl text-amber-900 text-xs flex items-start gap-3">
+            <div className="p-1 bg-amber-200 rounded-lg text-amber-900 font-bold shrink-0">⚠️</div>
+            <div>
+              <p className="font-bold text-sm text-amber-900 mb-0.5">Atención: No se pudieron cargar los datos financieros</p>
+              <p className="text-amber-800">
+                Asegúrate de haber ejecutado los scripts SQL de migración en la base de datos de producción (pgAdmin / Railway) para crear la tabla <code className="bg-amber-100 px-1 py-0.5 rounded font-mono font-bold">financial_movements</code>.
+              </p>
+              <p className="text-amber-700 font-mono text-[11px] mt-1.5">{apiError}</p>
             </div>
           </div>
         )}
