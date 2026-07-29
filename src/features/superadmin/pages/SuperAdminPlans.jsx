@@ -14,7 +14,11 @@ import {
 } from 'lucide-react';
 
 const formatCurrency = (val) =>
-  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(val || 0);
+  new Intl.NumberFormat('es-UY', {
+    style: 'currency',
+    currency: 'UYU',
+    maximumFractionDigits: 0
+  }).format(val || 0);
 
 const formatLimit = (val) => {
   if (val === -1 || val === '-1') return '∞';
