@@ -228,7 +228,7 @@ export default function SubscriptionPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xl font-bold text-slate-900">Plan Profesional</h4>
+                    <h4 className="text-xl font-bold text-slate-900">Plan Individual</h4>
                     <p className="text-sm text-slate-500 mt-1">Acceso completo e ilimitado para hacer crecer tu negocio.</p>
 
                     <div className="my-6">
