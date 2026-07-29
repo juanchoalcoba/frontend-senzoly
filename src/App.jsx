@@ -19,6 +19,7 @@ import CustomersPage from './features/dashboard/pages/CustomersPage';
 import ServicesPage from './features/dashboard/pages/ServicesPage';
 import SettingsPage from './features/dashboard/pages/SettingsPage';
 import BookingsPage from './features/dashboard/pages/BookingsPage';
+import FinancePage from './features/dashboard/pages/FinancePage';
 import PublicBookingPage from './features/public/pages/PublicBookingPage';
 import ProfessionalPortalPage from './features/public/pages/ProfessionalPortalPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
@@ -102,6 +103,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <BookingsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/finance"
+            element={
+              <ProtectedRoute>
+                <FinancePage />
               </ProtectedRoute>
             }
           />

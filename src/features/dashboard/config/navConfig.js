@@ -4,6 +4,7 @@ import {
   Briefcase,
   Calendar,
   UserCheck,
+  TrendingUp,
   Settings,
 } from 'lucide-react';
 
@@ -18,6 +19,11 @@ export const NAV_ITEMS = [
     path: '/dashboard/bookings',
     label: 'Reservas',
     icon: Calendar,
+  },
+  {
+    path: '/dashboard/finance',
+    label: 'Finanzas',
+    icon: TrendingUp,
   },
   {
     path: '/dashboard/employees',
