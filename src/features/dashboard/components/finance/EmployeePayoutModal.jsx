@@ -135,7 +135,7 @@ export default function EmployeePayoutModal({ token, employees = [], initialEmpl
                   <option value="">Selecciona un profesional...</option>
                   {employees.map((emp) => (
                     <option key={emp.id} value={emp.id}>
-                      {emp.firstName} {emp.lastName}
+                      {emp.first_name} {emp.last_name}
                     </option>
                   ))}
                 </select>
