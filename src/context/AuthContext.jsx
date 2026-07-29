@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [tenant, setTenant] = useState(null);
   const [subscription, setSubscription] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const [isTenantSuspended, setIsTenantSuspended] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,17 +20,20 @@ export const AuthProvider = ({ children }) => {
         const parsedUser = JSON.parse(storedUser);
         if (parsedUser.role === 'SUPER_ADMIN') {
           setUser(parsedUser);
+          setToken(storedToken);
         } else {
           try {
             const data = await fetchMe(storedToken);
             setUser(data.user);
             setTenant(data.tenant);
             setSubscription(data.subscription);
+            setToken(storedToken);
             localStorage.setItem('user', JSON.stringify(data.user));
           } catch (error) {
             console.error('Error al cargar sesión:', error);
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            setToken(null);
             setIsTenantSuspended(error.code === 'TENANT_UNAVAILABLE' && error.tenantStatus === 'suspended');
           }
         }
@@ -49,6 +53,7 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
     localStorage.setItem('token', data.token);
+    setToken(data.token);
     setIsTenantSuspended(false);
     
     // Obtener los datos completos del tenant tras loguearse
@@ -63,6 +68,7 @@ export const AuthProvider = ({ children }) => {
       if (error.code === 'TENANT_UNAVAILABLE') {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setToken(null);
         setIsTenantSuspended(error.tenantStatus === 'suspended');
         throw error;
       }
@@ -78,6 +84,7 @@ export const AuthProvider = ({ children }) => {
     const data = await superAdminLogin(credentials);
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
+    setToken(data.token);
     setUser(data.user);
     return data;
   };
@@ -88,11 +95,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setTenant(null);
     setSubscription(null);
+    setToken(null);
     setIsTenantSuspended(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, tenant, subscription, isLoading, isTenantSuspended, login, loginSuperAdmin, logout }}>
+    <AuthContext.Provider value={{ user, token, tenant, subscription, isLoading, isTenantSuspended, login, loginSuperAdmin, logout }}>
       {children}
     </AuthContext.Provider>
   );
