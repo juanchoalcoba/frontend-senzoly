@@ -20,6 +20,7 @@ import ServicesPage from './features/dashboard/pages/ServicesPage';
 import SettingsPage from './features/dashboard/pages/SettingsPage';
 import BookingsPage from './features/dashboard/pages/BookingsPage';
 import FinancePage from './features/dashboard/pages/FinancePage';
+import SubscriptionPage from './features/dashboard/pages/SubscriptionPage';
 import PublicBookingPage from './features/public/pages/PublicBookingPage';
 import ProfessionalPortalPage from './features/public/pages/ProfessionalPortalPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
@@ -112,6 +113,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <FinancePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/subscription"
+            element={
+              <ProtectedRoute>
+                <SubscriptionPage />
               </ProtectedRoute>
             }
           />

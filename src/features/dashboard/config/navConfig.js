@@ -5,6 +5,7 @@ import {
   Calendar,
   UserCheck,
   TrendingUp,
+  CreditCard,
   Settings,
 } from 'lucide-react';
 
@@ -39,6 +40,11 @@ export const NAV_ITEMS = [
     path: '/dashboard/customers',
     label: 'Clientes',
     icon: UserCheck,
+  },
+  {
+    path: '/dashboard/subscription',
+    label: 'Mi Suscripción',
+    icon: CreditCard,
   },
   {
     path: '/dashboard/settings',
