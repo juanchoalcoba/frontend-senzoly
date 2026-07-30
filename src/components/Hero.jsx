@@ -181,6 +181,13 @@ export default function Hero() {
         <div aria-hidden="true" className="hero-depth-overlay" />
         <div aria-hidden="true" className="hero-fine-grid" />
         <div aria-hidden="true" className="hero-content-glow" />
+        <svg className="absolute inset-0 w-full h-full pointer-events-none select-none"
+             viewBox="0 0 1440 800" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M-50,210 C 250,30 500,430 750,170 C 1000,-50 1250,300 1500,150"
+                fill="none" stroke="#cbd5e1" strokeWidth="6" opacity="0.18" />
+          <path d="M-50,260 C 250,80 500,480 750,220 C 1000,0 1250,350 1500,200"
+                fill="none" stroke="#FF6B00" strokeWidth="4" opacity="0.14" />
+        </svg>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
             {/* Left Column - Text content */}
