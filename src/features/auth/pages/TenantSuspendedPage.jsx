@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CircleAlert, CreditCard, Check, Loader2 } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
