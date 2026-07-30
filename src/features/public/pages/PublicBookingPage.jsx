@@ -145,6 +145,14 @@ export default function PublicBookingPage() {
     return `${year}-${month}-${day}`;
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const dateOnly = String(dateStr).split('T')[0];
+    const [y, m, d] = dateOnly.split('-');
+    if (!y || !m || !d) return '-';
+    return `${Number(d)}/${Number(m)}/${y}`;
+  };
+
   const formatPrice = (val) => {
     const num = parseFloat(val) || 0;
     return new Intl.NumberFormat("es-UY", {
@@ -750,7 +758,7 @@ export default function PublicBookingPage() {
                 <div>
                   <p className="text-slate-400 text-xs">Fecha y Hora</p>
                   <p className="text-white font-semibold">
-                    {confirmation.booking.booking_date} —{" "}
+                    {formatDate(confirmation.booking.booking_date)} —{" "}
                     {confirmation.booking.start_time?.substring(0, 5)}
                   </p>
                 </div>
