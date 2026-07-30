@@ -38,25 +38,10 @@ import SuperAdminStats from './features/superadmin/pages/SuperAdminStats';
 import SuperAdminConfig from './features/superadmin/pages/SuperAdminConfig';
 import SuperAdminAudit from './features/superadmin/pages/SuperAdminAudit';
 import SuperAdminProtectedRoute from './components/SuperAdminProtectedRoute';
-import Lenis from "@studio-freight/lenis";
+
 
 
 function App() {
-
-  useEffect(() => {
-  const lenis = new Lenis();
-
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-
-  requestAnimationFrame(raf);
-
-  return () => {
-    lenis.destroy();
-  };
-}, []);
 
 
 
