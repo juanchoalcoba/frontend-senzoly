@@ -89,7 +89,9 @@ export default function SettingsPage() {
         dayOfWeek: h.day_of_week,
         openTime: h.open_time ? h.open_time.substring(0, 5) : '09:00',
         closeTime: h.close_time ? h.close_time.substring(0, 5) : '19:00',
-        isClosed: Boolean(h.is_closed)
+        isClosed: Boolean(h.is_closed),
+        breakStart: h.break_start ? h.break_start.substring(0, 5) : '',
+        breakEnd: h.break_end ? h.break_end.substring(0, 5) : '',
       }));
       setHours(formatted);
     } catch (err) {
@@ -148,13 +150,46 @@ export default function SettingsPage() {
 
     // Validación preventiva en cliente
     for (const h of hours) {
-      if (!h.isClosed && h.openTime >= h.closeTime) {
-        const dayObj = DAYS_MAP.find(d => d.dayOfWeek === h.dayOfWeek);
-        setHoursMessage({
-          type: 'error',
-          text: `En ${dayObj?.name || 'un día abierto'}, la hora de apertura debe ser anterior a la de cierre.`
-        });
-        return;
+      if (!h.isClosed) {
+        if (h.openTime >= h.closeTime) {
+          const dayObj = DAYS_MAP.find(d => d.dayOfWeek === h.dayOfWeek);
+          setHoursMessage({
+            type: 'error',
+            text: `En ${dayObj?.name || 'un día abierto'}, la hora de apertura debe ser anterior a la de cierre.`
+          });
+          return;
+        }
+
+        const hasBreakStart = h.breakStart && h.breakStart.trim() !== '';
+        const hasBreakEnd = h.breakEnd && h.breakEnd.trim() !== '';
+
+        if (hasBreakStart !== hasBreakEnd) {
+          const dayObj = DAYS_MAP.find(d => d.dayOfWeek === h.dayOfWeek);
+          setHoursMessage({
+            type: 'error',
+            text: `En ${dayObj?.name || 'un día'}, debe especificar tanto inicio como fin de la pausa.`
+          });
+          return;
+        }
+
+        if (hasBreakStart && hasBreakEnd) {
+          if (h.breakStart >= h.breakEnd) {
+            const dayObj = DAYS_MAP.find(d => d.dayOfWeek === h.dayOfWeek);
+            setHoursMessage({
+              type: 'error',
+              text: `En ${dayObj?.name || 'un día'}, la hora de inicio de pausa debe ser anterior a la de fin.`
+            });
+            return;
+          }
+          if (h.breakStart < h.openTime || h.breakEnd > h.closeTime) {
+            const dayObj = DAYS_MAP.find(d => d.dayOfWeek === h.dayOfWeek);
+            setHoursMessage({
+              type: 'error',
+              text: `En ${dayObj?.name || 'un día'}, la pausa debe estar dentro del horario de apertura y cierre.`
+            });
+            return;
+          }
+        }
       }
     }
 
@@ -165,7 +200,9 @@ export default function SettingsPage() {
         dayOfWeek: h.dayOfWeek,
         openTime: `${h.openTime}:00`,
         closeTime: `${h.closeTime}:00`,
-        isClosed: h.isClosed
+        isClosed: h.isClosed,
+        breakStart: h.breakStart ? `${h.breakStart}:00` : null,
+        breakEnd: h.breakEnd ? `${h.breakEnd}:00` : null,
       }));
 
       const updated = await updateBusinessHours(token, payload);
@@ -173,7 +210,9 @@ export default function SettingsPage() {
         dayOfWeek: h.day_of_week,
         openTime: h.open_time ? h.open_time.substring(0, 5) : '09:00',
         closeTime: h.close_time ? h.close_time.substring(0, 5) : '19:00',
-        isClosed: Boolean(h.is_closed)
+        isClosed: Boolean(h.is_closed),
+        breakStart: h.break_start ? h.break_start.substring(0, 5) : '',
+        breakEnd: h.break_end ? h.break_end.substring(0, 5) : '',
       }));
       setHours(formatted);
 
@@ -444,7 +483,9 @@ export default function SettingsPage() {
                         dayOfWeek: d.dayOfWeek,
                         openTime: '09:00',
                         closeTime: '19:00',
-                        isClosed: false
+                        isClosed: false,
+                        breakStart: '',
+                        breakEnd: '',
                       };
 
                       return (
@@ -472,29 +513,55 @@ export default function SettingsPage() {
                               Cerrado todo el día
                             </span>
                           ) : (
-                            <div className="flex items-center gap-2">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs text-slate-500">Apertura:</span>
-                                <input
-                                  type="time"
-                                  required
-                                  value={dayHour.openTime}
-                                  onChange={(e) => updateDayHour(d.dayOfWeek, 'openTime', e.target.value)}
-                                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-orange-500"
-                                />
+                            <div className="flex flex-col gap-1.5">
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs text-slate-500">Apertura:</span>
+                                  <input
+                                    type="time"
+                                    required
+                                    value={dayHour.openTime}
+                                    onChange={(e) => updateDayHour(d.dayOfWeek, 'openTime', e.target.value)}
+                                    className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-orange-500"
+                                  />
+                                </div>
+
+                                <span className="text-slate-400 text-xs">—</span>
+
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs text-slate-500">Cierre:</span>
+                                  <input
+                                    type="time"
+                                    required
+                                    value={dayHour.closeTime}
+                                    onChange={(e) => updateDayHour(d.dayOfWeek, 'closeTime', e.target.value)}
+                                    className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-orange-500"
+                                  />
+                                </div>
                               </div>
 
-                              <span className="text-slate-400 text-xs">—</span>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs text-slate-400">Pausa:</span>
+                                  <input
+                                    type="time"
+                                    value={dayHour.breakStart}
+                                    onChange={(e) => updateDayHour(d.dayOfWeek, 'breakStart', e.target.value)}
+                                    className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 outline-none focus:border-orange-500"
+                                  />
+                                </div>
 
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs text-slate-500">Cierre:</span>
-                                <input
-                                  type="time"
-                                  required
-                                  value={dayHour.closeTime}
-                                  onChange={(e) => updateDayHour(d.dayOfWeek, 'closeTime', e.target.value)}
-                                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-orange-500"
-                                />
+                                <span className="text-slate-300 text-xs">—</span>
+
+                                <div className="flex items-center gap-1.5">
+                                  <input
+                                    type="time"
+                                    value={dayHour.breakEnd}
+                                    onChange={(e) => updateDayHour(d.dayOfWeek, 'breakEnd', e.target.value)}
+                                    className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 outline-none focus:border-orange-500"
+                                  />
+                                  <span className="text-[10px] text-slate-400 italic">(opcional)</span>
+                                </div>
                               </div>
                             </div>
                           )}
