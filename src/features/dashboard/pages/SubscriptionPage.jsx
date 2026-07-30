@@ -221,57 +221,105 @@ export default function SubscriptionPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Plan Profesional Destacado */}
-                <div className="relative bg-white rounded-2xl border-2 border-orange-500 p-6 shadow-md flex flex-col justify-between overflow-hidden">
-                  <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5" /> Recomendado
-                  </div>
+                {plans.map((plan, idx) => (
+                  <div
+                    key={plan.id}
+                    className="relative bg-white rounded-2xl border-2 border-orange-500 p-6 shadow-md flex flex-col justify-between overflow-hidden"
+                  >
+                    {idx === 0 && (
+                      <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5" /> Recomendado
+                      </div>
+                    )}
 
-                  <div>
-                    <h4 className="text-xl font-bold text-slate-900">Plan Individual</h4>
-                    <p className="text-sm text-slate-500 mt-1">Acceso completo e ilimitado para hacer crecer tu negocio.</p>
+                    <div>
+                      <h4 className="text-xl font-bold text-slate-900">{plan.name}</h4>
 
-                    <div className="my-6">
-                      <span className="text-3xl font-extrabold text-slate-900">{formatCurrency(plans[0]?.price || 14900)}</span>
-                      <span className="text-slate-500 font-medium"> / mes</span>
+                      <div className="my-6">
+                        <span className="text-3xl font-extrabold text-slate-900">{formatCurrency(plan.price)}</span>
+                        <span className="text-slate-500 font-medium"> / {plan.billing_period === 'YEARLY' ? 'año' : 'mes'}</span>
+                      </div>
+
+                      <ul className="space-y-3 mb-8">
+                        {plan.max_users === -1 ? (
+                          <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                            <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                            <span>Usuarios ilimitados</span>
+                          </li>
+                        ) : (
+                          <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                            <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                            <span>Hasta {plan.max_users} usuarios</span>
+                          </li>
+                        )}
+                        {plan.max_locations === -1 ? (
+                          <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                            <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                            <span>Sucursales ilimitadas</span>
+                          </li>
+                        ) : (
+                          <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                            <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                            <span>Hasta {plan.max_locations} sucursal</span>
+                          </li>
+                        )}
+                        {plan.max_bookings === -1 ? (
+                          <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                            <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                            <span>Reservas ilimitadas sin comisiones por cliente</span>
+                          </li>
+                        ) : (
+                          <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                            <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                            <span>Hasta {plan.max_bookings} reservas</span>
+                          </li>
+                        )}
+                        <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                          <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                          <span>Agenda inteligente con visualización diaria/semanal</span>
+                        </li>
+                        <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                          <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                          <span>Gestión completa de clientes e historial de atenciones</span>
+                        </li>
+                        <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                          <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                          <span>Integración nativa con WhatsApp</span>
+                        </li>
+                        <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                          <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                          <span>Gestión de empleados y comisiones automáticas</span>
+                        </li>
+                        <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                          <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                          <span>Módulo de Finanzas y reportes de facturación</span>
+                        </li>
+                        <li className="flex items-start gap-2.5 text-sm text-slate-700">
+                          <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                          <span>Portal Profesional para colaboradores</span>
+                        </li>
+                      </ul>
                     </div>
 
-                    <ul className="space-y-3 mb-8">
-                      {[
-                        'Agenda inteligente con visualización diaria/semanal',
-                        'Reservas y turnos ilimitados sin comisiones por cliente',
-                        'Gestión completa de clientes e historial de atenciones',
-                        'Integración nativa con WhatsApp',
-                        'Gestión de empleados y comisiones automáticas',
-                        'Módulo de Finanzas y reportes de facturación',
-                        'Portal Profesional para colaboradores',
-                      ].map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700">
-                          <Check className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <button
+                      onClick={() => handleSubscribe(plan.id)}
+                      disabled={checkoutLoading}
+                      className="w-full py-3.5 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {checkoutLoading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span>Redirigiendo a MercadoPago...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5" />
+                          <span>Contratar con MercadoPago Checkout Pro</span>
+                        </>
+                      )}
+                    </button>
                   </div>
-
-                  <button
-                    onClick={() => handleSubscribe(plans[0]?.id)}
-                    disabled={checkoutLoading}
-                    className="w-full py-3.5 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {checkoutLoading ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Redirigiendo a MercadoPago...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="w-5 h-5" />
-                        <span>Contratar con MercadoPago Checkout Pro</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
 
