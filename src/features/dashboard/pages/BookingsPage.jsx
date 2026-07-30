@@ -3,7 +3,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import { getBookings, getBookingStats, updateBookingStatus } from '../services/bookingApi';
 import {
   Calendar, CheckCircle2, XCircle, Clock, Search, 
-  User, Scissors, DollarSign, ChevronDown, AlertCircle, RefreshCw
+  User, Scissors, DollarSign, ChevronDown, AlertCircle, RefreshCw, MessageCircle
 } from 'lucide-react';
 
 const STATUS_LABELS = {
@@ -231,7 +231,25 @@ export default function BookingsPage() {
                             </div>
                             <div>
                               <p className="font-semibold text-slate-900">{b.customer_first_name} {b.customer_last_name}</p>
-                              <p className="text-xs text-slate-400">{b.customer_email || b.customer_phone || '-'}</p>
+                              <div className="flex flex-wrap items-center gap-x-1.5 text-xs text-slate-400">
+                                {b.customer_email && <span>{b.customer_email}</span>}
+                                {b.customer_phone && (
+                                  <>
+                                    {b.customer_email && <span className="text-slate-300">·</span>}
+                                    <a
+                                      href={`https://wa.me/${b.customer_phone.replace(/[\s\-\+\(\)]/g, '')}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <MessageCircle className="w-3.5 h-3.5" />
+                                      {b.customer_phone}
+                                    </a>
+                                  </>
+                                )}
+                                {!b.customer_email && !b.customer_phone && <span className="italic">-</span>}
+                              </div>
                             </div>
                           </div>
                         </td>
