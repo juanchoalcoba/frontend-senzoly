@@ -314,7 +314,7 @@ export default function SubscriptionPage() {
                       ) : (
                         <>
                           <CreditCard className="w-5 h-5" />
-                          <span>Contratar con MercadoPago Checkout Pro</span>
+                          <span>Contratar con MercadoPago</span>
                         </>
                       )}
                     </button>
