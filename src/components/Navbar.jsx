@@ -47,14 +47,14 @@ export default function Navbar() {
               >
                 Inicio
               </a>
-              <a
-                href="/#funciones"
+              <Link
+                to="/como-funciona"
                 className="text-slate-600 font-medium text-sm hover:text-slate-900 transition-colors"
               >
                 Funciones
-              </a>
+              </Link>
               <a
-                href="/#precios"
+                href="/#planes"
                 className="text-slate-600 font-medium text-sm hover:text-slate-900 transition-colors"
               >
                 Precios
@@ -65,24 +65,6 @@ export default function Navbar() {
               >
                 Casos de éxito
               </Link>
-              <div className="relative group flex items-center cursor-pointer">
-                <span className="text-slate-600 font-medium text-sm hover:text-slate-900 transition-colors">
-                  Recursos
-                </span>
-                <svg
-                  className="ml-1 w-4 h-4 text-slate-400 group-hover:text-slate-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
             </nav>
 
             {/* Right Buttons (Desktop) */}
@@ -143,8 +125,8 @@ export default function Navbar() {
 
             <div className="flex flex-col gap-1">
               <a href="/#inicio" onClick={closeMenu} className="rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-orange-50 hover:text-orange-600">Inicio</a>
-              <a href="/#funciones" onClick={closeMenu} className="rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-orange-50 hover:text-orange-600">Funciones</a>
-              <a href="/#precios" onClick={closeMenu} className="rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-orange-50 hover:text-orange-600">Precios</a>
+              <Link to="/como-funciona" onClick={closeMenu} className="rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-orange-50 hover:text-orange-600">Funciones</Link>
+              <a href="/#planes" onClick={closeMenu} className="rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-orange-50 hover:text-orange-600">Precios</a>
               <Link to="/casos-de-exito" onClick={closeMenu} className="rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-orange-50 hover:text-orange-600">Casos de éxito</Link>
             </div>
 
