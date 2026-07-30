@@ -226,7 +226,7 @@ export default function SubscriptionPage() {
                     key={plan.id}
                     className="relative bg-white rounded-2xl border-2 border-orange-500 p-6 shadow-md flex flex-col justify-between overflow-hidden"
                   >
-                    {idx === 0 && (
+                    {idx === 1 && (
                       <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider flex items-center gap-1">
                         <Sparkles className="w-3.5 h-3.5" /> Recomendado
                       </div>
