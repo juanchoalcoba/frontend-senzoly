@@ -15,7 +15,7 @@ export default function ServiceImage({ src, alt, className = '', placeholderClas
         alt={alt}
         loading="lazy"
         onError={() => setHasLoadError(true)}
-        className={`object-cover ${className}`}
+        className={`object-cover object-center ${className}`}
       />
     );
   }
