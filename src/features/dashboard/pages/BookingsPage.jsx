@@ -84,6 +84,11 @@ export default function BookingsPage() {
     }).format(parseFloat(val) || 0);
   };
 
+  const toWhatsAppNumber = (phone) => {
+    const digits = phone.replace(/[\s\-\+\(\)]/g, '');
+    return digits.startsWith('0') ? '598' + digits.slice(1) : digits;
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-6">
@@ -237,7 +242,7 @@ export default function BookingsPage() {
                                   <>
                                     {b.customer_email && <span className="text-slate-300">·</span>}
                                     <a
-                                      href={`https://wa.me/${b.customer_phone.replace(/[\s\-\+\(\)]/g, '')}`}
+                                      href={`https://wa.me/${toWhatsAppNumber(b.customer_phone)}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium"
