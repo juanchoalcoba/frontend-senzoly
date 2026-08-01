@@ -10,7 +10,7 @@ const plans = [
     price: "Gratis durante 30 días",
     description: "Conoce Senzoly sin compromiso.",
     features: [
-      "Hasta 20 reservas",
+      "Reservas ilimitadas",
       "1 agenda",
       "Hasta 7 empleados",
       "Gestión de clientes",
