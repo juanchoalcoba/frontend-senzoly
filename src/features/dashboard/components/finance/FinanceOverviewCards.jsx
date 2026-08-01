@@ -1,11 +1,11 @@
 import React from 'react';
-import { DollarSign, TrendingUp, Users, CheckCircle2, Award, Star, CreditCard, CalendarDays } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, CheckCircle2, Award, Star, CreditCard, CalendarDays, MinusCircle } from 'lucide-react';
 
 export default function FinanceOverviewCards({ overview, kpis, loading }) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        {[1, 2, 3, 4, 5].map((i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
           <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm animate-pulse h-28 flex flex-col justify-between">
             <div className="h-4 bg-slate-200 rounded w-1/2"></div>
             <div className="h-7 bg-slate-200 rounded w-3/4"></div>
@@ -33,11 +33,18 @@ export default function FinanceOverviewCards({ overview, kpis, loading }) {
       description: 'Facturación total cobrada',
     },
     {
-      title: 'Ingresos Netos',
+      title: 'Egresos Totales',
+      value: formatMoney(overview?.expensesTotal),
+      icon: MinusCircle,
+      color: 'bg-red-50 text-red-600 border-red-100',
+      description: 'Gastos operativos del período',
+    },
+    {
+      title: (overview?.netTotal || 0) < 0 ? 'Resultado Neto' : 'Ingresos Netos',
       value: formatMoney(overview?.netTotal),
       icon: TrendingUp,
-      color: 'bg-orange-50 text-orange-600 border-orange-100',
-      description: 'Ganancia limpia del negocio',
+      color: (overview?.netTotal || 0) < 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-orange-50 text-orange-600 border-orange-100',
+      description: (overview?.netTotal || 0) < 0 ? 'Déficit acumulado del período' : 'Ganancia limpia del negocio',
     },
     {
       title: 'Pagos a Empleados',
@@ -64,8 +71,8 @@ export default function FinanceOverviewCards({ overview, kpis, loading }) {
 
   return (
     <div className="space-y-6 mb-6">
-      {/* 5 Tarjetas Principales de Métricas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* 6 Tarjetas Principales de Métricas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {cards.map((card, idx) => {
           const Icon = card.icon;
           return (

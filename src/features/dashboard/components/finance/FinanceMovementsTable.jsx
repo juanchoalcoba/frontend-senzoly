@@ -51,7 +51,21 @@ export default function FinanceMovementsTable({
         </div>
 
         {/* Filtros */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+          {/* Filtro Tipo Movimiento */}
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs">
+            <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+            <select
+              value={filters.type || ''}
+              onChange={(e) => onFilterChange({ ...filters, type: e.target.value })}
+              className="bg-transparent w-full focus:outline-none text-slate-700 font-bold cursor-pointer"
+            >
+              <option value="">Todos los movimientos</option>
+              <option value="INCOME">🟢 Solo Ingresos (Servicios)</option>
+              <option value="EXPENSE">🔴 Solo Egresos (Gastos)</option>
+            </select>
+          </div>
+
           {/* Filtro Empleado */}
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs">
             <User className="w-4 h-4 text-slate-400 shrink-0" />
@@ -135,21 +149,29 @@ export default function FinanceMovementsTable({
             </thead>
             <tbody className="divide-y divide-slate-100">
               {movements.map((mov) => {
+                const isExpense = mov.type === 'EXPENSE';
                 const badge = paymentMethodBadges[mov.paymentMethod] || {
                   label: mov.paymentMethod || 'Efectivo',
                   color: 'bg-slate-100 text-slate-700 border-slate-200',
                 };
 
                 return (
-                  <tr key={mov.id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={mov.id} className={`hover:bg-slate-50/60 transition-colors ${isExpense ? 'bg-red-50/20' : ''}`}>
                     <td className="p-3.5 pl-6 text-slate-600 font-medium whitespace-nowrap">
                       {formatDate(mov.createdAt)}
                     </td>
                     <td className="p-3.5 font-semibold text-slate-900">
-                      {mov.customerName || 'Cliente ocasional'}
+                      {isExpense ? '—' : (mov.customerName || 'Cliente ocasional')}
                     </td>
                     <td className="p-3.5 font-medium text-slate-800">
-                      {mov.serviceName}
+                      <span className="flex items-center gap-1.5">
+                        {isExpense && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">
+                            EGRESO
+                          </span>
+                        )}
+                        {mov.serviceName}
+                      </span>
                     </td>
                     <td className="p-3.5 font-medium text-slate-700">
                       {mov.employeeName || 'Sin asignar'}
@@ -160,12 +182,12 @@ export default function FinanceMovementsTable({
                       </span>
                     </td>
                     <td className="p-3.5 text-right font-medium text-slate-900">
-                      {formatMoney(mov.grossAmount)}
+                      {isExpense ? formatMoney(0) : formatMoney(mov.grossAmount)}
                     </td>
                     <td className="p-3.5 text-right font-medium text-blue-600">
                       {formatMoney(mov.employeePayout)}
                     </td>
-                    <td className="p-3.5 text-right font-bold text-emerald-600">
+                    <td className={`p-3.5 text-right font-bold ${mov.businessNetIncome < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                       {formatMoney(mov.businessNetIncome)}
                     </td>
                     <td className="p-3.5 pr-6 text-slate-400 max-w-xs truncate italic">
