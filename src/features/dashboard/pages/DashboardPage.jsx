@@ -166,10 +166,13 @@ export default function DashboardPage() {
             </div>
 
             {/* Caja de Acción del Enlace */}
-            <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 flex flex-col gap-3 min-w-full sm:min-w-[320px] lg:min-w-[380px]">
-              <div className="flex items-center justify-between text-xs text-slate-300 px-1 font-medium">
+            <div className="bg-slate-950/60 backdrop-blur-xl p-4 rounded-2xl border border-white/15 flex flex-col gap-3 min-w-full sm:min-w-[320px] lg:min-w-[380px] shadow-2xl">
+              <div className="flex items-center justify-between text-xs text-slate-200 px-1 font-semibold">
                 <span>URL de tu negocio:</span>
-                <span className="text-emerald-400 font-semibold">Online • Público</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Online • Público
+                </span>
               </div>
 
               {/* Input con URL */}
