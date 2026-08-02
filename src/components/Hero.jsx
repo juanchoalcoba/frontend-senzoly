@@ -183,10 +183,21 @@ export default function Hero() {
         <div aria-hidden="true" className="hero-content-glow" />
         <svg className="absolute inset-0 w-full h-full pointer-events-none select-none"
              viewBox="0 0 1440 800" preserveAspectRatio="none" aria-hidden="true">
+          {/* Ola superior morada sutil */}
+          <path d="M-50,120 C 300,-40 600,280 900,90 C 1200,-100 1350,180 1500,80"
+                fill="none" stroke="#a855f7" strokeWidth="3" opacity="0.12" strokeDasharray="12 8" />
+          {/* Ola principal gris slate */}
           <path d="M-50,210 C 250,30 500,430 750,170 C 1000,-50 1250,300 1500,150"
                 fill="none" stroke="#cbd5e1" strokeWidth="6" opacity="0.18" />
+          {/* Ola destacada naranja Senzoly */}
           <path d="M-50,260 C 250,80 500,480 750,220 C 1000,0 1250,350 1500,200"
-                fill="none" stroke="#FF6B00" strokeWidth="4" opacity="0.14" />
+                fill="none" stroke="#FF6B00" strokeWidth="4" opacity="0.16" />
+          {/* Ola media inferior naranja */}
+          <path d="M-50,450 C 350,250 650,600 950,380 C 1150,200 1350,490 1500,320"
+                fill="none" stroke="#FF6B00" strokeWidth="3.5" opacity="0.14" />
+          {/* Ola inferior cian suave */}
+          <path d="M-50,520 C 200,380 550,680 850,460 C 1150,240 1380,560 1500,410"
+                fill="none" stroke="#06b6d4" strokeWidth="2.5" opacity="0.12" />
         </svg>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
@@ -310,25 +321,29 @@ export default function Hero() {
             </div>
 
             <style>{`
-@keyframes heroFloat {
-  0%,100% {
+@keyframes heroGlowPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 30px rgba(255, 107, 0, 0.35)) drop-shadow(0 10px 25px rgba(15, 23, 42, 0.08));
     transform: translateY(0) scale(1);
   }
   50% {
-    transform: translateY(-10px) scale(1.03);
+    filter: drop-shadow(0 0 50px rgba(255, 107, 0, 0.6)) drop-shadow(0 0 65px rgba(99, 102, 241, 0.35));
+    transform: translateY(-8px) scale(1.02);
   }
 }
 `}</style>
 
-            {/* Right Column - Image */}
+            {/* Right Column - Image with Ambient Glow */}
             <div className="hidden lg:flex lg:mb-10 lg:col-span-6 relative justify-center lg:justify-end items-center">
+              {/* Halo de resplandor ambiental trasero */}
+              <div className="absolute w-96 h-96 bg-gradient-to-tr from-orange-500/20 via-indigo-500/15 to-purple-500/10 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+
               <img
                 src="/heroright.webp"
                 alt="Senzoly Dashboard"
                 className="w-full max-w-2xl h-auto object-contain relative z-10"
                 style={{
-                  animation: "heroFloat 6s ease-in-out infinite",
-                  filter: "drop-shadow(0 0 35px rgba(251,146,60,.35))",
+                  animation: "heroGlowPulse 6s ease-in-out infinite",
                 }}
               />
             </div>
