@@ -21,6 +21,7 @@ import SettingsPage from './features/dashboard/pages/SettingsPage';
 import BookingsPage from './features/dashboard/pages/BookingsPage';
 import FinancePage from './features/dashboard/pages/FinancePage';
 import SubscriptionPage from './features/dashboard/pages/SubscriptionPage';
+import BranchesPage from './features/dashboard/pages/BranchesPage';
 import PublicBookingPage from './features/public/pages/PublicBookingPage';
 import ProfessionalPortalPage from './features/public/pages/ProfessionalPortalPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
@@ -128,6 +129,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <SubscriptionPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/sucursales"
+            element={
+              <ProtectedRoute>
+                <BranchesPage />
               </ProtectedRoute>
             }
           />

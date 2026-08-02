@@ -7,6 +7,7 @@ import {
   TrendingUp,
   CreditCard,
   Settings,
+  Building2,
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
@@ -25,6 +26,11 @@ export const NAV_ITEMS = [
     path: '/dashboard/finance',
     label: 'Finanzas',
     icon: TrendingUp,
+  },
+  {
+    path: '/dashboard/sucursales',
+    label: 'Sucursales',
+    icon: Building2,
   },
   {
     path: '/dashboard/employees',

@@ -41,6 +41,7 @@ export default function PublicBookingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [selectedBranch, setSelectedBranch] = useState(null);
   const [step, setStep] = useState(0);
   const [selectedService, setSelectedService] = useState(null);
   const [professionals, setProfessionals] = useState([]);
@@ -67,6 +68,9 @@ export default function PublicBookingPage() {
       try {
         const data = await getTenantBySlug(slug);
         setTenantData(data);
+        if (data?.branches && data.branches.length === 1) {
+          setSelectedBranch(data.branches[0]);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -91,7 +95,7 @@ export default function PublicBookingPage() {
       setProfessionals([]);
       setSelectedProfessional(null);
       try {
-        const data = await getAvailableProfessionals(slug, selectedService.id);
+        const data = await getAvailableProfessionals(slug, selectedService.id, selectedBranch?.id);
         if (!isCurrentRequest) return;
         setProfessionals(data);
         if (data.length === 1) setSelectedProfessional(data[0]);
@@ -106,7 +110,7 @@ export default function PublicBookingPage() {
     return () => {
       isCurrentRequest = false;
     };
-  }, [selectedService, slug]);
+  }, [selectedService, selectedBranch, slug]);
 
   useEffect(() => {
     if (!selectedService || !selectedDate) {
@@ -180,13 +184,14 @@ export default function PublicBookingPage() {
       const result = await createPublicBooking(slug, {
         serviceId: selectedService.id,
         employeeId: selectedProfessional?.id,
+        branchId: selectedBranch?.id,
         bookingDate: selectedDate,
         startTime: selectedSlot,
         customer: customerForm,
         notes: customerForm.notes,
       });
       setConfirmation(result);
-      setStep(4);
+      setStep(hasMultipleBranches ? 5 : 4);
     } catch (err) {
       setFormError(err.message || "Error al confirmar la reserva.");
     } finally {
@@ -224,6 +229,18 @@ export default function PublicBookingPage() {
   }
 
   const { tenant, services } = tenantData;
+  const branches = tenantData.branches || [];
+  const hasMultipleBranches = branches.length >= 2;
+  const currentSteps = hasMultipleBranches
+    ? ["Sucursal", "Servicio", "Profesional", "Fecha y Hora", "Tus Datos", "Confirmación"]
+    : ["Servicio", "Profesional", "Fecha y Hora", "Tus Datos", "Confirmación"];
+
+  const serviceStepIdx = hasMultipleBranches ? 1 : 0;
+  const professionalStepIdx = hasMultipleBranches ? 2 : 1;
+  const datetimeStepIdx = hasMultipleBranches ? 3 : 2;
+  const customerStepIdx = hasMultipleBranches ? 4 : 3;
+  const confirmationStepIdx = hasMultipleBranches ? 5 : 4;
+
   const presentation = getBusinessTypePresentation(tenant.businessType?.slug);
   const BusinessIcon = presentation.icon;
 
@@ -265,11 +282,11 @@ export default function PublicBookingPage() {
         </div>
       </header>
 
-      {/* Stepper */}
-      {step < 4 && (
+      {/* Stepper Dinámico */}
+      {step < confirmationStepIdx && (
         <div className="max-w-2xl mx-auto px-6 pt-8">
           <div className="flex items-center gap-1">
-            {STEPS.slice(0, 4).map((s, i) => (
+            {currentSteps.slice(0, confirmationStepIdx).map((s, i) => (
               <React.Fragment key={i}>
                 <div
                   className={`flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-full transition-all ${
@@ -293,7 +310,7 @@ export default function PublicBookingPage() {
                   </span>
                   <span className="hidden sm:inline">{s}</span>
                 </div>
-                {i < 3 && (
+                {i < confirmationStepIdx - 1 && (
                   <div
                     className={`flex-1 h-px ${step > i ? "bg-orange-500/60" : "bg-slate-700"}`}
                   ></div>
@@ -306,8 +323,63 @@ export default function PublicBookingPage() {
 
       {/* Content Area */}
       <main className="max-w-2xl mx-auto px-6 py-8 space-y-5">
-        {/* PASO 0: SELECCIÓN DE SERVICIO */}
-        {step === 0 && (
+        {/* PASO 0: SELECCIÓN DE SUCURSAL (SÓLO MULTI-SEDE) */}
+        {hasMultipleBranches && step === 0 && (
+          <div className="space-y-4">
+            <h2 className="text-white font-bold text-xl">
+              ¿En qué sucursal deseas agendar tu turno?
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {branches.map((b) => (
+                <button
+                  key={b.id}
+                  onClick={() => {
+                    setSelectedBranch(b);
+                    setSelectedService(null);
+                    setSelectedProfessional(null);
+                    setSelectedDate("");
+                    setSelectedSlot("");
+                    setStep(1);
+                  }}
+                  className={`w-full text-left bg-white/5 border ${
+                    selectedBranch?.id === b.id
+                      ? "border-orange-500 bg-orange-500/10"
+                      : "border-white/10 hover:border-white/25"
+                  } rounded-2xl overflow-hidden transition-all flex flex-col justify-between hover:scale-[1.01]`}
+                >
+                  <div className="relative h-32 bg-slate-800 overflow-hidden w-full">
+                    {b.image_url ? (
+                      <img src={b.image_url} alt={b.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-slate-800 to-orange-950 flex flex-col items-center justify-center text-slate-400">
+                        <MapPin className="w-8 h-8 text-orange-400/60 mb-1" />
+                        <span className="text-[10px] text-slate-400 font-medium">Sucursal {b.name}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 space-y-1">
+                    <p className="text-white font-bold text-base">{b.name}</p>
+                    {b.address && (
+                      <p className="text-slate-400 text-xs flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                        <span>{b.address}</span>
+                      </p>
+                    )}
+                    {b.phone && (
+                      <p className="text-slate-400 text-xs flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                        <span>{b.phone}</span>
+                      </p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PASO SELECCIÓN DE SERVICIO */}
+        {step === serviceStepIdx && (
           <div className="space-y-4">
             <h2 className="text-white font-bold text-xl">
               ¿Qué servicio deseas agendar?
@@ -326,7 +398,7 @@ export default function PublicBookingPage() {
                       setSelectedService(s);
                       setSelectedDate("");
                       setSelectedSlot("");
-                      setStep(1);
+                      setStep(professionalStepIdx);
                     }}
                     className={`w-full text-left bg-white/5 border ${
                       selectedService?.id === s.id
@@ -365,8 +437,8 @@ export default function PublicBookingPage() {
           </div>
         )}
 
-        {/* PASO 1: SELECCIÓN DE PROFESIONAL */}
-        {step === 1 && selectedService && (
+        {/* PASO SELECCIÓN DE PROFESIONAL */}
+        {step === professionalStepIdx && selectedService && (
           <div className="space-y-5">
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-center justify-between">
               <div>
@@ -380,7 +452,7 @@ export default function PublicBookingPage() {
                 </p>
               </div>
               <button
-                onClick={() => setStep(0)}
+                onClick={() => setStep(serviceStepIdx)}
                 className="text-slate-400 hover:text-white text-xs flex items-center gap-1"
               >
                 <ChevronLeft className="w-4 h-4" /> Cambiar
@@ -466,13 +538,13 @@ export default function PublicBookingPage() {
 
             <div className="flex justify-between">
               <button
-                onClick={() => setStep(0)}
+                onClick={() => setStep(serviceStepIdx)}
                 className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-all"
               >
                 <ChevronLeft className="w-4 h-4" /> Volver
               </button>
               <button
-                onClick={() => setStep(2)}
+                onClick={() => setStep(datetimeStepIdx)}
                 disabled={professionalsLoading}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm disabled:opacity-40 transition-all"
               >
@@ -482,8 +554,8 @@ export default function PublicBookingPage() {
           </div>
         )}
 
-        {/* PASO 2: FECHA Y HORA */}
-        {step === 2 && selectedService && (
+        {/* PASO FECHA Y HORA */}
+        {step === datetimeStepIdx && selectedService && (
           <div className="space-y-5">
             {/* Selected service summary */}
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-center justify-between">
@@ -498,7 +570,7 @@ export default function PublicBookingPage() {
                 </p>
               </div>
               <button
-                onClick={() => setStep(1)}
+                onClick={() => setStep(professionalStepIdx)}
                 className="text-slate-400 hover:text-white text-xs flex items-center gap-1"
               >
                 <ChevronLeft className="w-4 h-4" /> Cambiar
@@ -566,7 +638,7 @@ export default function PublicBookingPage() {
 
             <div className="flex justify-end">
               <button
-                onClick={() => setStep(3)}
+                onClick={() => setStep(customerStepIdx)}
                 disabled={!selectedDate || !selectedSlot}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm disabled:opacity-40 transition-all"
               >
@@ -576,8 +648,8 @@ export default function PublicBookingPage() {
           </div>
         )}
 
-        {/* PASO 3: DATOS DEL CLIENTE */}
-        {step === 3 && (
+        {/* PASO DATOS DEL CLIENTE */}
+        {step === customerStepIdx && (
           <div className="space-y-5">
             {/* Summary bar */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-wrap gap-3 text-xs text-slate-400">
@@ -710,7 +782,7 @@ export default function PublicBookingPage() {
 
             <div className="flex justify-between">
               <button
-                onClick={() => setStep(2)}
+                onClick={() => setStep(datetimeStepIdx)}
                 className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-all"
               >
                 <ChevronLeft className="w-4 h-4" /> Volver
@@ -734,8 +806,8 @@ export default function PublicBookingPage() {
           </div>
         )}
 
-        {/* PASO 4: CONFIRMACIÓN */}
-        {step === 4 && confirmation && (
+        {/* PASO CONFIRMACIÓN */}
+        {step === confirmationStepIdx && confirmation && (
           <div className="text-center space-y-6 py-8">
             <div className="w-20 h-20 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-10 h-10 text-emerald-400" />
