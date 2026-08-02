@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
-import { getEmployees, createEmployee, updateEmployee, deleteEmployee, regenerateEmployeeToken } from '../services/employeeApi';
+import {
+  getEmployees,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+  regenerateEmployeeToken,
+  uploadEmployeeAvatar,
+  deleteEmployeeAvatar,
+} from '../services/employeeApi';
 import { getServices } from '../services/serviceCatalogApi';
 import { useAuth } from '../../../context/AuthContext';
-import { Plus, Edit2, Trash2, X, Lock, Link, RefreshCw, Check } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Lock, Link, RefreshCw, Check, Camera, Upload, User } from 'lucide-react';
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
@@ -15,6 +23,10 @@ export default function EmployeesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   
+  // Image state
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+
   // Form state
   const [formData, setFormData] = useState({
     firstName: '',
@@ -61,6 +73,8 @@ export default function EmployeesPage() {
 
   const openModal = (employee = null) => {
     setFormError('');
+    setAvatarFile(null);
+    setAvatarPreview(employee?.avatar_url || null);
     
     // Check limits if creating a new employee
     if (!employee && subscription?.plan) {
@@ -105,6 +119,32 @@ export default function EmployeesPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingEmployee(null);
+    setAvatarFile(null);
+    setAvatarPreview(null);
+  };
+
+  const handleAvatarFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setFormError('La foto no puede superar los 5 MB');
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemovePhoto = async () => {
+    if (editingEmployee && editingEmployee.avatar_url) {
+      try {
+        await deleteEmployeeAvatar(token, editingEmployee.id);
+        setEditingEmployee({ ...editingEmployee, avatar_url: null });
+      } catch (err) {
+        console.error('Error eliminando foto:', err);
+      }
+    }
+    setAvatarFile(null);
+    setAvatarPreview(null);
   };
 
   const handleSubmit = async (e) => {
@@ -113,11 +153,18 @@ export default function EmployeesPage() {
     setFormLoading(true);
     
     try {
+      let savedEmployee;
       if (editingEmployee) {
-        await updateEmployee(token, editingEmployee.id, formData);
+        savedEmployee = await updateEmployee(token, editingEmployee.id, formData);
       } else {
-        await createEmployee(token, formData);
+        savedEmployee = await createEmployee(token, formData);
       }
+
+      // Upload avatar if a new file was chosen
+      if (avatarFile && savedEmployee?.id) {
+        await uploadEmployeeAvatar(token, savedEmployee.id, avatarFile);
+      }
+
       await loadEmployees();
       closeModal();
     } catch (err) {
@@ -157,7 +204,7 @@ export default function EmployeesPage() {
   const handleRegenerateToken = async (employee) => {
     if (window.confirm(`¿Confirmas que deseas regenerar el enlace de portal para ${employee.first_name}? El enlace anterior dejará de funcionar inmediatamente.`)) {
       try {
-        const updated = await regenerateEmployeeToken(token, employee.id);
+        await regenerateEmployeeToken(token, employee.id);
         await loadEmployees();
         alert(`Nuevo enlace generado. Puedes copiarlo desde la lista de acciones.`);
       } catch (err) {
@@ -201,7 +248,7 @@ export default function EmployeesPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="p-4 text-sm font-semibold text-slate-600">Nombre</th>
+                    <th className="p-4 text-sm font-semibold text-slate-600">Empleado</th>
                     <th className="p-4 text-sm font-semibold text-slate-600">Contacto</th>
                     <th className="p-4 text-sm font-semibold text-slate-600">Estado</th>
                     <th className="p-4 text-sm font-semibold text-slate-600 text-right">Acciones</th>
@@ -211,7 +258,20 @@ export default function EmployeesPage() {
                   {employees.map(emp => (
                     <tr key={emp.id} className="hover:bg-slate-50/50">
                       <td className="p-4">
-                        <div className="font-medium text-slate-900">{emp.first_name} {emp.last_name}</div>
+                        <div className="flex items-center gap-3">
+                          {emp.avatar_url ? (
+                            <img
+                              src={emp.avatar_url}
+                              alt={`${emp.first_name} ${emp.last_name}`}
+                              className="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-sm">
+                              {emp.first_name?.[0]}{emp.last_name?.[0]}
+                            </div>
+                          )}
+                          <div className="font-semibold text-slate-900">{emp.first_name} {emp.last_name}</div>
+                        </div>
                       </td>
                       <td className="p-4">
                         <div className="text-sm text-slate-600">{emp.email || '-'}</div>
@@ -308,6 +368,44 @@ export default function EmployeesPage() {
                       {formError}
                     </div>
                   )}
+
+                  {/* Foto de Perfil / Avatar Upload */}
+                  <div className="flex flex-col items-center justify-center pb-2">
+                    <div className="relative group">
+                      {avatarPreview ? (
+                        <img
+                          src={avatarPreview}
+                          alt="Foto del profesional"
+                          className="w-24 h-24 rounded-full object-cover border-2 border-orange-500 shadow-md"
+                        />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400">
+                          <User className="w-8 h-8" />
+                          <span className="text-[10px] mt-1 font-medium">Sin foto</span>
+                        </div>
+                      )}
+
+                      <label className="absolute bottom-0 right-0 p-2 bg-orange-600 text-white rounded-full cursor-pointer hover:bg-orange-700 shadow-md transition-transform hover:scale-105">
+                        <Camera className="w-4 h-4" />
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handleAvatarFileChange}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    {avatarPreview && (
+                      <button
+                        type="button"
+                        onClick={handleRemovePhoto}
+                        className="mt-2 text-xs text-red-600 hover:text-red-700 font-medium"
+                      >
+                        Quitar foto
+                      </button>
+                    )}
+                  </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>

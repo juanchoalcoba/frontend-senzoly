@@ -429,15 +429,23 @@ export default function PublicBookingPage() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
-                            isSelected
-                              ? "bg-orange-500 text-white"
-                              : "bg-slate-800 text-slate-300 group-hover:bg-slate-700"
-                          }`}
-                        >
-                          <User className="w-5 h-5" />
-                        </div>
+                        {professional.avatar_url ? (
+                          <img
+                            src={professional.avatar_url}
+                            alt={`${professional.first_name} ${professional.last_name}`}
+                            className="w-12 h-12 rounded-2xl object-cover border border-white/10 shadow-md shrink-0"
+                          />
+                        ) : (
+                          <div
+                            className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm transition-colors shrink-0 ${
+                              isSelected
+                                ? "bg-gradient-to-tr from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20"
+                                : "bg-slate-800 text-slate-300 group-hover:bg-slate-700"
+                            }`}
+                          >
+                            {professional.first_name?.[0]}{professional.last_name?.[0]}
+                          </div>
+                        )}
                         <div className="min-w-0 flex-1">
                           <p className="text-white font-bold truncate">
                             {professional.first_name} {professional.last_name}
