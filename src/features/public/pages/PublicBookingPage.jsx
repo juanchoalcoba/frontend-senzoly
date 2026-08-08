@@ -43,6 +43,8 @@ export default function PublicBookingPage() {
 
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [step, setStep] = useState(0);
+  const [services, setServices] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [professionals, setProfessionals] = useState([]);
   const [professionalsLoading, setProfessionalsLoading] = useState(false);
@@ -68,6 +70,7 @@ export default function PublicBookingPage() {
       try {
         const data = await getTenantBySlug(slug);
         setTenantData(data);
+        setServices(data?.services || []);
         if (data?.branches && data.branches.length === 1) {
           setSelectedBranch(data.branches[0]);
         }
@@ -85,6 +88,29 @@ export default function PublicBookingPage() {
 
     return () => setRouteThemeSlug(null);
   }, [tenantData?.tenant?.businessType?.slug, setRouteThemeSlug]);
+
+  useEffect(() => {
+    if (!tenantData) return;
+
+    let isCurrentRequest = true;
+    const fetchServices = async () => {
+      setServicesLoading(true);
+      try {
+        const data = await getTenantBySlug(slug, selectedBranch?.id || null);
+        if (!isCurrentRequest) return;
+        setServices(data.services || []);
+      } catch (err) {
+        if (isCurrentRequest) setServices([]);
+      } finally {
+        if (isCurrentRequest) setServicesLoading(false);
+      }
+    };
+
+    fetchServices();
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [slug, selectedBranch, tenantData]);
 
   useEffect(() => {
     if (!selectedService) return;
@@ -228,7 +254,7 @@ export default function PublicBookingPage() {
     );
   }
 
-  const { tenant, services } = tenantData;
+  const { tenant } = tenantData;
   const branches = tenantData.branches || [];
   const hasMultipleBranches = branches.length >= 2;
   const currentSteps = hasMultipleBranches
@@ -384,10 +410,15 @@ export default function PublicBookingPage() {
             <h2 className="text-white font-bold text-xl">
               ¿Qué servicio deseas agendar?
             </h2>
-            {services.length === 0 ? (
+            {servicesLoading ? (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-slate-400">
+                <Loader2 className="w-6 h-6 animate-spin mx-auto mb-3 text-orange-400" />
+                Cargando servicios disponibles...
+              </div>
+            ) : services.length === 0 ? (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-slate-400">
                 <BusinessIcon className="w-8 h-8 mx-auto mb-2 text-slate-600" />
-                <p>El negocio no tiene servicios activos en este momento.</p>
+                <p>El negocio no tiene servicios activos en esta sucursal en este momento.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
