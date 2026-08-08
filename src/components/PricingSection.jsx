@@ -26,7 +26,7 @@ const plans = [
   },
   {
     name: "Individual",
-    price: "$1.490 / mes",
+    price: "$890 / mes",
     description: "Para profesionales independientes.",
     features: [
       "Todo lo de Prueba",
@@ -44,7 +44,7 @@ const plans = [
   },
   {
     name: "Equipo",
-    price: "$2.490 / mes",
+    price: "$1.490 / mes",
     description: "Perfecto para pequeños equipos.",
     features: [
       "Todo lo de Individual",
@@ -62,7 +62,7 @@ const plans = [
   },
   {
     name: "Pro+",
-    price: "$3.990 / mes",
+    price: "$3.200 / mes",
     description: "Pensado para empresas en crecimiento.",
     features: [
       "Todo lo de Equipo",
