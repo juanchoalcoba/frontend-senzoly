@@ -199,10 +199,8 @@ export default function PublicBookingPage() {
       setFormError("El nombre y apellido son obligatorios.");
       return;
     }
-    if (!email.trim() && !phone.trim()) {
-      setFormError(
-        "Debes indicar al menos un método de contacto (email o teléfono).",
-      );
+    if (!phone.trim()) {
+      setFormError("El número de teléfono es obligatorio.");
       return;
     }
     setSubmitting(true);
@@ -776,12 +774,13 @@ export default function PublicBookingPage() {
 
               <div>
                 <label className="block text-xs text-slate-400 font-semibold mb-1">
-                  Teléfono
+                  Teléfono *
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <input
-                    type="text"
+                    type="tel"
+                    required
                     placeholder="+598 99 000 000"
                     value={customerForm.phone}
                     onChange={(e) =>
