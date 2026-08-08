@@ -657,7 +657,7 @@ export default function PublicBookingPage() {
                         <span className="block">{slot.time}</span>
                         {!slot.available && (
                           <span className="block text-[10px] font-medium mt-0.5">
-                            Ocupado
+                            No disponible
                           </span>
                         )}
                       </button>
