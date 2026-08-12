@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Quote, Scissors, Sparkles, Stethoscope, Trophy, Star, ArrowRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 const stories = [
   {
@@ -29,7 +30,7 @@ const stories = [
 
 export default function SuccessStoriesPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 relative">
       <Navbar />
       <main>
         <section className="relative overflow-hidden bg-white py-20 sm:py-24">
@@ -77,6 +78,8 @@ export default function SuccessStoriesPage() {
         </section>
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }
+

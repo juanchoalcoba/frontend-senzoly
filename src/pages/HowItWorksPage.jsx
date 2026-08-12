@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarDays, ChartNoAxesCombined, ClipboardList, Rocket, Settings2, Share2, UserPlus } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 const steps = [
   { title: 'Crear cuenta', description: 'Registra tu negocio y empieza con una base clara para tu operación.', icon: UserPlus },
@@ -15,7 +16,7 @@ const steps = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 relative">
       <Navbar />
       <main>
         <section className="relative overflow-hidden bg-white py-20 sm:py-24">
@@ -62,6 +63,8 @@ export default function HowItWorksPage() {
         </section>
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }
+

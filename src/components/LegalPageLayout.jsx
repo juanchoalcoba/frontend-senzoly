@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import WhatsAppButton from './WhatsAppButton';
 
 export default function LegalPageLayout({ title, updatedAt, children }) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 relative">
       <header className="border-b border-slate-200 bg-white">
         <div className="max-w-3xl mx-auto px-6 h-20 flex items-center justify-between">
           <Link to="/" aria-label="Ir al inicio de Senzoly">
@@ -20,6 +21,8 @@ export default function LegalPageLayout({ title, updatedAt, children }) {
           {children}
         </article>
       </main>
+      <WhatsAppButton />
     </div>
   );
 }
+

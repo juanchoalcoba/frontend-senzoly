@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaInstagram, FaWhatsapp, FaLinkedinIn } from "react-icons/fa";
+import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import { HiOutlineCalendarDays } from "react-icons/hi2";
 import Typed from "typed.js";
 
@@ -294,17 +294,6 @@ export default function Hero() {
                   className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
                 >
                   <FaInstagram size={22} />
-                </a>
-
-                {/* WhatsApp */}
-                <a
-                  href="https://wa.me/59899458702"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="WhatsApp"
-                  className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-[#FF6B00] hover:text-white hover:border-[#FF6B00] transition-all duration-300 flex items-center justify-center text-slate-700"
-                >
-                  <FaWhatsapp size={22} />
                 </a>
 
                 {/* LinkedIn */}

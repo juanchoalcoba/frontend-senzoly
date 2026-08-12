@@ -5,10 +5,11 @@ import AboutSection from '../components/AboutSection';
 import PricingSection from '../components/PricingSection';
 import CtaSection from '../components/CtaSection';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 relative">
       <Navbar />
       <main className="pb-16 md:pb-0">
         <Hero />
@@ -17,6 +18,8 @@ export default function LandingPage() {
         <CtaSection />
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }
+
