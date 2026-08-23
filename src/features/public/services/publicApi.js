@@ -38,3 +38,21 @@ export const createPublicBooking = async (slug, bookingPayload) => {
   if (!data.success) throw new Error(data.message);
   return data.data;
 };
+
+export const getBookingByManageToken = async (token) => {
+  const res = await fetch(`${API_URL}/public/bookings/manage/${token}`);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
+export const cancelBookingByManageToken = async (token, reason = '') => {
+  const res = await fetch(`${API_URL}/public/bookings/manage/${token}/cancel`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason })
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};

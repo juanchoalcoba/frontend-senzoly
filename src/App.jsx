@@ -24,6 +24,7 @@ import SubscriptionPage from './features/dashboard/pages/SubscriptionPage';
 import BranchesPage from './features/dashboard/pages/BranchesPage';
 import PublicBookingPage from './features/public/pages/PublicBookingPage';
 import ProfessionalPortalPage from './features/public/pages/ProfessionalPortalPage';
+import ManageBookingPage from './features/public/pages/ManageBookingPage';
 import SuccessStoriesPage from './pages/SuccessStoriesPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -42,10 +43,15 @@ import SuperAdminProtectedRoute from './components/SuperAdminProtectedRoute';
 
 
 
+import { onForegroundMessage } from './config/firebase';
+
 function App() {
-
-
-//cambio
+  useEffect(() => {
+    const unsubscribe = onForegroundMessage();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
   return (
     <AuthProvider>
@@ -144,6 +150,7 @@ function App() {
 
           {/* ─── Portal Público de Reservas y Portal Profesional ─── */}
           <Route path="/reserva/:slug" element={<PublicBookingPage />} />
+          <Route path="/reserva/gestionar/:token" element={<ManageBookingPage />} />
           <Route path="/p/:token" element={<ProfessionalPortalPage />} />
 
           {/* ─── Portal Super Admin ─── */}

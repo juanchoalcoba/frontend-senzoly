@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   getTenantBySlug,
   getAvailableProfessionals,
   getAvailableSlots,
   createPublicBooking,
 } from "../services/publicApi";
+import { requestFcmToken } from "../../../config/firebase";
 import { useTheme } from "../../../context/ThemeContext";
 import { getBusinessTypePresentation } from "../../../theme/businessTypePresentation";
 import ServiceImage from "../../../components/ServiceImage";
@@ -23,6 +24,9 @@ import {
   Loader2,
   MapPin,
   FileText,
+  Bell,
+  MessageCircle,
+  ExternalLink,
 } from "lucide-react";
 
 const STEPS = [
@@ -894,7 +898,49 @@ export default function PublicBookingPage() {
                 </div>
               </div>
             </div>
-            <p className="text-slate-500 text-xs">
+
+            {/* Acciones Adicionales de Notificación y Gestión */}
+            <div className="max-w-sm mx-auto space-y-3 pt-2">
+              <button
+                onClick={() => {
+                  requestFcmToken({
+                    tenantId: tenant.id,
+                    customerId: confirmation.customer.id,
+                    bookingId: confirmation.booking.id,
+                  }).then(t => {
+                    if (t) alert('¡Recordatorio push activado con éxito en este dispositivo!');
+                  });
+                }}
+                className="w-full py-3 px-4 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 font-medium rounded-xl transition flex items-center justify-center gap-2 text-sm"
+              >
+                <Bell className="w-4 h-4 text-indigo-400" />
+                Activar recordatorio en este dispositivo
+              </button>
+
+              {confirmation.manageToken && (
+                <Link
+                  to={`/reserva/gestionar/${confirmation.manageToken}`}
+                  className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium rounded-xl transition flex items-center justify-center gap-2 text-sm"
+                >
+                  <ExternalLink className="w-4 h-4 text-orange-400" />
+                  Gestionar o Cancelar mi Reserva
+                </Link>
+              )}
+
+              {tenant.phone && (
+                <a
+                  href={`https://wa.me/${tenant.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${tenant.name}, acabo de reservar ${confirmation.service.name} para el ${confirmation.booking.booking_date} a las ${confirmation.booking.start_time?.substring(0, 5)} hs.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 px-4 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-medium rounded-xl transition flex items-center justify-center gap-2 text-sm"
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-400" />
+                  Contactar al Negocio por WhatsApp
+                </a>
+              )}
+            </div>
+
+            <p className="text-slate-500 text-xs pt-2">
               Ante cualquier cambio, comunícate con{" "}
               <strong className="text-slate-300">{tenant.name}</strong>
               {tenant.phone && (

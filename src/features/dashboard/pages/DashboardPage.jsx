@@ -5,6 +5,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { getBookings } from '../services/bookingApi';
 import { getCustomers } from '../services/customerApi';
 import { getServices } from '../services/serviceCatalogApi';
+import { requestFcmToken } from '../../../config/firebase';
 import {
   Building2,
   CreditCard,
@@ -26,6 +27,12 @@ import {
 export default function DashboardPage() {
   const { user, tenant, subscription } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (tenant?.id && user?.id) {
+      requestFcmToken({ tenantId: tenant.id, userId: user.id });
+    }
+  }, [tenant?.id, user?.id]);
 
   const [copiedLink, setCopiedLink] = useState(false);
   const [todayBookings, setTodayBookings] = useState([]);
