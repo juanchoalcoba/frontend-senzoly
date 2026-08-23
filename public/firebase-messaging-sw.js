@@ -1,14 +1,16 @@
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
-// Configuración pública de Firebase en el Service Worker
+// Configuración dinámica de Firebase en el Service Worker desde la URL de registro
+const urlParams = new URLSearchParams(self.location.search);
+
 firebase.initializeApp({
-  apiKey: "AIzaSyDrqGUWFh2RekszJT1p0Y_u3gsTzzKsHHQ",
-  authDomain: "senzoly.firebaseapp.com",
-  projectId: "senzoly",
-  storageBucket: "senzoly.firebasestorage.app",
-  messagingSenderId: "203577861663",
-  appId: "1:203577861663:web:332b10190711ad672c172a"
+  apiKey: urlParams.get('apiKey') || '',
+  authDomain: urlParams.get('authDomain') || '',
+  projectId: urlParams.get('projectId') || '',
+  storageBucket: urlParams.get('storageBucket') || '',
+  messagingSenderId: urlParams.get('messagingSenderId') || '',
+  appId: urlParams.get('appId') || '',
 });
 
 const messaging = firebase.messaging();

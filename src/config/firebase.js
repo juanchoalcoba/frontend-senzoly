@@ -3,15 +3,15 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { API_URL } from './api';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDrqGUWFh2RekszJT1p0Y_u3gsTzzKsHHQ",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "senzoly.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "senzoly",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "senzoly.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "203577861663",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:203577861663:web:332b10190711ad672c172a",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_API_ID || import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY || "BM80rZtagjYbyNA8VtzJSmMfUxVaXMG7Bxxsk8I39kr9JC9i-6nzKNnDdU6oRhQp7ZqtKiohXfjlQbWNPD3m3C0";
+const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
 let app = null;
 let messaging = null;
@@ -38,7 +38,8 @@ export const requestFcmToken = async ({ tenantId = null, userId = null, customer
       return null;
     }
 
-    await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const swUrl = `/firebase-messaging-sw.js?apiKey=${encodeURIComponent(firebaseConfig.apiKey || '')}&authDomain=${encodeURIComponent(firebaseConfig.authDomain || '')}&projectId=${encodeURIComponent(firebaseConfig.projectId || '')}&storageBucket=${encodeURIComponent(firebaseConfig.storageBucket || '')}&messagingSenderId=${encodeURIComponent(firebaseConfig.messagingSenderId || '')}&appId=${encodeURIComponent(firebaseConfig.appId || '')}`;
+    await navigator.serviceWorker.register(swUrl);
     const serviceWorkerRegistration = await navigator.serviceWorker.ready;
     
     const token = await getToken(messaging, {
