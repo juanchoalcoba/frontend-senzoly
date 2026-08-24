@@ -907,6 +907,7 @@ export default function PublicBookingPage() {
                     tenantId: tenant.id,
                     customerId: confirmation.customer.id,
                     bookingId: confirmation.booking.id,
+                    manageToken: confirmation.manageToken,
                   }).then(t => {
                     if (t) alert('¡Recordatorio push activado con éxito en este dispositivo!');
                   });

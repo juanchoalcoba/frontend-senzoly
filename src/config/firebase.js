@@ -25,7 +25,7 @@ try {
   console.warn('[Firebase Client] No se pudo inicializar Firebase en este navegador:', error.message);
 }
 
-export const requestFcmToken = async ({ tenantId = null, userId = null, customerId = null, bookingId = null } = {}) => {
+export const requestFcmToken = async ({ tenantId = null, userId = null, customerId = null, bookingId = null, manageToken = null } = {}) => {
   if (!messaging || typeof window === 'undefined' || !('Notification' in window)) {
     console.warn('[FCM] Notificaciones no soportadas en este dispositivo/navegador.');
     return null;
@@ -58,6 +58,7 @@ export const requestFcmToken = async ({ tenantId = null, userId = null, customer
           userId,
           customerId,
           bookingId,
+          manageToken,
           deviceType: /Mobi|Android/i.test(navigator.userAgent) ? 'web_mobile' : 'web_desktop',
         }),
       });
