@@ -32,10 +32,18 @@ export const requestFcmToken = async ({ tenantId = null, userId = null, customer
   }
 
   try {
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      console.log('[FCM] Permiso de notificaciones denegado por el usuario.');
+    let permission = Notification.permission;
+    if (permission === 'denied') {
+      console.log('[FCM] Permiso de notificaciones denegado en el navegador.');
       return null;
+    }
+
+    if (permission !== 'granted') {
+      permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        console.log('[FCM] Permiso de notificaciones no otorgado.');
+        return null;
+      }
     }
 
     const swUrl = `/firebase-messaging-sw.js?apiKey=${encodeURIComponent(firebaseConfig.apiKey || '')}&authDomain=${encodeURIComponent(firebaseConfig.authDomain || '')}&projectId=${encodeURIComponent(firebaseConfig.projectId || '')}&storageBucket=${encodeURIComponent(firebaseConfig.storageBucket || '')}&messagingSenderId=${encodeURIComponent(firebaseConfig.messagingSenderId || '')}&appId=${encodeURIComponent(firebaseConfig.appId || '')}`;
@@ -78,11 +86,14 @@ export const onForegroundMessage = (callback) => {
     const title = payload.notification?.title || payload.data?.title || 'Senzoly';
     const body = payload.notification?.body || payload.data?.body || '';
     const targetUrl = payload.data?.url || '/';
+    const defaultIcon = typeof window !== 'undefined' ? `${window.location.origin}/faviconsenzoly.png` : '/faviconsenzoly.png';
+    const iconUrl = payload.notification?.icon || payload.data?.icon || defaultIcon;
 
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
       const notification = new Notification(title, {
         body,
-        icon: '/faviconsenzoly.png',
+        icon: iconUrl,
+        badge: iconUrl,
         data: payload.data || {},
       });
       notification.onclick = (event) => {
