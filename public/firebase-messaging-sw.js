@@ -25,9 +25,9 @@ self.addEventListener('activate', (event) => {
 
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Notificación recibida en segundo plano:', payload);
-  const notificationTitle = payload.notification?.title || 'Senzoly';
+  const notificationTitle = payload.notification?.title || payload.data?.title || 'Senzoly';
   const notificationOptions = {
-    body: payload.notification?.body || '',
+    body: payload.notification?.body || payload.data?.body || '',
     icon: '/faviconsenzoly.png',
     badge: '/faviconsenzoly.png',
     data: payload.data || {},

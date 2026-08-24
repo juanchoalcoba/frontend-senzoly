@@ -22,6 +22,7 @@ import {
   Sparkles,
   CheckCircle2,
   AlertCircle,
+  Bell,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -145,6 +146,21 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                if (tenant?.id && user?.id) {
+                  requestFcmToken({ tenantId: tenant.id, userId: user.id }).then(t => {
+                    if (t) alert('¡Notificaciones en tiempo real activadas en esta notebook!');
+                    else alert('No se pudo activar el permiso de notificaciones en este navegador.');
+                  });
+                }
+              }}
+              className="text-xs px-3 py-1.5 rounded-xl font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5 cursor-pointer"
+              title="Activar o verificar notificaciones en este equipo"
+            >
+              <Bell className="w-3.5 h-3.5 text-indigo-600" />
+              Notificaciones Push
+            </button>
             <span className="text-xs px-3 py-1.5 rounded-xl font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Negocio Activo

@@ -75,15 +75,23 @@ export const onForegroundMessage = (callback) => {
   if (!messaging) return () => {};
   return onMessage(messaging, (payload) => {
     console.log('[FCM] Notificación recibida en primer plano:', payload);
-    const title = payload.notification?.title || 'Senzoly';
-    const body = payload.notification?.body || '';
+    const title = payload.notification?.title || payload.data?.title || 'Senzoly';
+    const body = payload.notification?.body || payload.data?.body || '';
+    const targetUrl = payload.data?.url || '/';
 
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, {
+      const notification = new Notification(title, {
         body,
         icon: '/faviconsenzoly.png',
         data: payload.data || {},
       });
+      notification.onclick = (event) => {
+        event.preventDefault();
+        window.focus();
+        if (targetUrl) {
+          window.location.href = targetUrl;
+        }
+      };
     }
 
     if (callback) callback(payload);
