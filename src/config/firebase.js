@@ -86,14 +86,17 @@ export const onForegroundMessage = (callback) => {
     const title = payload.notification?.title || payload.data?.title || 'Senzoly';
     const body = payload.notification?.body || payload.data?.body || '';
     const targetUrl = payload.data?.url || '/';
-    const defaultIcon = typeof window !== 'undefined' ? `${window.location.origin}/faviconsenzoly.png` : '/faviconsenzoly.png';
+    const defaultIcon = typeof window !== 'undefined' ? `${window.location.origin}/notification-icon.png` : '/notification-icon.png';
     const iconUrl = payload.notification?.icon || payload.data?.icon || defaultIcon;
+    const notificationTag = payload.notification?.tag || payload.data?.tag || 'senzoly-notification';
 
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
       const notification = new Notification(title, {
         body,
         icon: iconUrl,
         badge: iconUrl,
+        tag: notificationTag,
+        renotify: true,
         data: payload.data || {},
       });
       notification.onclick = (event) => {
