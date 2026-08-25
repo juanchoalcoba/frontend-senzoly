@@ -94,7 +94,6 @@ export const onForegroundMessage = (callback) => {
       const notification = new Notification(title, {
         body,
         icon: iconUrl,
-        badge: iconUrl,
         tag: notificationTag,
         renotify: true,
         data: payload.data || {},
