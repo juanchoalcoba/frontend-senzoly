@@ -34,14 +34,14 @@ export const requestFcmToken = async ({ tenantId = null, userId = null, customer
   try {
     let permission = Notification.permission;
     if (permission === 'denied') {
-      console.log('[FCM] Permiso de notificaciones denegado en el navegador.');
+      alert('Las notificaciones están denegadas en la configuración de tu navegador. Por favor permítelas en tu navegador para recibir los recordatorios.');
       return null;
     }
 
     if (permission !== 'granted') {
       permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        console.log('[FCM] Permiso de notificaciones no otorgado.');
+        alert('No se otorgó el permiso de notificaciones.');
         return null;
       }
     }
@@ -67,7 +67,7 @@ export const requestFcmToken = async ({ tenantId = null, userId = null, customer
           customerId,
           bookingId,
           manageToken,
-          deviceType: /Mobi|Android/i.test(navigator.userAgent) ? 'web_mobile' : 'web_desktop',
+          deviceType: /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'web_mobile' : 'web_desktop',
         }),
       });
       console.log('[FCM] Token de dispositivo registrado con éxito');
