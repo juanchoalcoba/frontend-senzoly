@@ -26,8 +26,8 @@ try {
 }
 
 export const requestFcmToken = async ({ tenantId = null, userId = null, customerId = null, bookingId = null, manageToken = null } = {}) => {
-  if (!messaging || typeof window === 'undefined' || !('Notification' in window)) {
-    console.warn('[FCM] Notificaciones no soportadas en este dispositivo/navegador.');
+  if (typeof window === 'undefined' || !('Notification' in window) || !messaging) {
+    alert('En tu iPhone/Safari debes agregar la web a la Pantalla de Inicio (Compartir ⎋ -> Añadir a inicio) para habilitar notificaciones Push nativas.');
     return null;
   }
 

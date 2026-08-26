@@ -68,6 +68,7 @@ export default function PublicBookingPage() {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
+  const [reminderActivated, setReminderActivated] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -909,13 +910,21 @@ export default function PublicBookingPage() {
                     bookingId: confirmation.booking.id,
                     manageToken: confirmation.manageToken,
                   }).then(t => {
-                    if (t) alert('¡Recordatorio push activado con éxito en este dispositivo!');
+                    if (t) {
+                      setReminderActivated(true);
+                      alert('¡Recordatorio push activado con éxito en este dispositivo!');
+                    }
                   });
                 }}
-                className="w-full py-3 px-4 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 font-medium rounded-xl transition flex items-center justify-center gap-2 text-sm"
+                disabled={reminderActivated}
+                className={`w-full py-3 px-4 ${
+                  reminderActivated
+                    ? 'bg-emerald-600/40 border-emerald-500/50 text-emerald-200'
+                    : 'bg-indigo-600/30 hover:bg-indigo-600/50 border-indigo-500/40 text-indigo-200'
+                } border font-medium rounded-xl transition flex items-center justify-center gap-2 text-sm`}
               >
-                <Bell className="w-4 h-4 text-indigo-400" />
-                Activar recordatorio en este dispositivo
+                <Bell className={`w-4 h-4 ${reminderActivated ? 'text-emerald-400' : 'text-indigo-400'}`} />
+                {reminderActivated ? '✓ Recordatorio activado en este dispositivo' : 'Activar recordatorio en este dispositivo'}
               </button>
 
               {confirmation.manageToken && (
