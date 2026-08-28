@@ -45,16 +45,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    let data;
-    try {
-      data = await apiLogin(credentials);
-    } catch (error) {
-      setIsTenantSuspended(error.code === 'TENANT_UNAVAILABLE' && error.tenantStatus === 'suspended');
-      throw error;
-    }
+    const data = await apiLogin(credentials);
+    const isSuspended = Boolean(data.isSuspended || data.tenantStatus === 'suspended');
+
     localStorage.setItem('token', data.token);
     setToken(data.token);
-    setIsTenantSuspended(false);
+    setIsTenantSuspended(isSuspended);
     
     // Obtener los datos completos del tenant tras loguearse
     try {
@@ -63,19 +59,12 @@ export const AuthProvider = ({ children }) => {
       setUser(meData.user);
       setTenant(meData.tenant);
       setSubscription(meData.subscription);
-      return meData;
+      return { ...meData, isSuspended };
     } catch (error) {
-      if (error.code === 'TENANT_UNAVAILABLE') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setToken(null);
-        setIsTenantSuspended(error.tenantStatus === 'suspended');
-        throw error;
-      }
-      // Si falla obtener los detalles, seteamos al menos lo básico
+      // Si falla obtener los detalles (ej: cuenta suspendida), seteamos al menos lo básico
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
-      return data;
+      return { ...data, isSuspended };
     }
   };
 

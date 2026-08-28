@@ -17,7 +17,11 @@ export default function LoginForm() {
     setErrorMsg('');
     
     try {
-      await login(formData);
+      const res = await login(formData);
+      if (res?.isSuspended || res?.tenant?.status === 'suspended') {
+        navigate('/account-suspended', { replace: true });
+        return;
+      }
       navigate('/dashboard'); // Redirigir al dashboard tras el login
     } catch (err) {
       if (err.code === 'TENANT_UNAVAILABLE' && err.tenantStatus === 'suspended') {
