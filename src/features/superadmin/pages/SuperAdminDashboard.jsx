@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import {
   deleteSuperAdminTenant,
   getSuperAdminStats,
   getSuperAdminTenant,
   getSuperAdminTenants,
-  reactivateSuperAdminTenant,
   suspendSuperAdminTenant,
 } from '../../auth/services/authApi';
 import { 
   Building2, Users, CreditCard, Activity, 
   Search, Filter, Eye, Power, PowerOff, Trash2,
-  Calendar, CheckCircle, Clock, AlertTriangle, Briefcase, CalendarDays
+  Calendar, CheckCircle, Clock, AlertTriangle, Briefcase, CalendarDays, CheckCircle2
 } from 'lucide-react';
+import ReactivateTenantModal from '../components/ReactivateTenantModal';
 
 export default function SuperAdminDashboard() {
   const { user } = useAuth();
@@ -22,57 +22,38 @@ export default function SuperAdminDashboard() {
   const [tenants, setTenants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTenant, setSelectedTenant] = useState(null);
+  const [reactivatingTenant, setReactivatingTenant] = useState(null);
   const [actionError, setActionError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const fetchData = useCallback(async () => {
+    try {
+      const [statsData, tenantsData] = await Promise.all([
+        getSuperAdminStats(token),
+        getSuperAdminTenants(token)
+      ]);
+      setStats(statsData);
+      setTenants(tenantsData);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [token]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [statsData, tenantsData] = await Promise.all([
-          getSuperAdminStats(token),
-          getSuperAdminTenants(token)
-        ]);
-        setStats(statsData);
-        setTenants(tenantsData);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     if (token) fetchData();
-  }, [token]);
+  }, [token, fetchData]);
+
+  const handleReactivateSuccess = (updatedTenant) => {
+    setSuccessMessage(`Empresa ${updatedTenant.name} reactivada correctamente en el plan ${updatedTenant.plan_name || ''}.`);
+    fetchData();
+  };
 
   const openTenant = async (tenantId) => {
     try {
       setActionError('');
       setSelectedTenant(await getSuperAdminTenant(token, tenantId));
-    } catch (error) {
-      setActionError(error.message);
-    }
-  };
-
-  const changeTenantStatus = async (tenant, action) => {
-    const labels = { suspend: 'suspender', reactivate: 'reactivar', delete: 'eliminar' };
-    if (!window.confirm(`¿Confirmas que deseas ${labels[action]} ${tenant.name}?`)) return;
-
-    try {
-      setActionError('');
-      const operations = {
-        suspend: suspendSuperAdminTenant,
-        reactivate: reactivateSuperAdminTenant,
-        delete: deleteSuperAdminTenant,
-      };
-      const updated = await operations[action](token, tenant.id);
-      if (action === 'delete') {
-        setTenants((current) => current.filter((item) => item.id !== tenant.id));
-        setSelectedTenant(null);
-        return;
-      }
-      setTenants((current) => current.map((item) => (
-        item.id === tenant.id ? { ...item, ...updated } : item
-      )));
-      setSelectedTenant((current) => current?.id === tenant.id ? { ...current, ...updated } : current);
     } catch (error) {
       setActionError(error.message);
     }
@@ -98,6 +79,21 @@ export default function SuperAdminDashboard() {
         <h1 className="text-2xl font-bold text-slate-900">Bienvenido, {user?.firstName}</h1>
         <p className="text-slate-500">Resumen general de la plataforma Senzoly.</p>
       </div>
+
+      {successMessage && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>{successMessage}</span>
+          </div>
+          <button
+            onClick={() => setSuccessMessage('')}
+            className="text-emerald-700 hover:text-emerald-950 font-medium text-xs ml-4"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
 
       {actionError && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -233,10 +229,20 @@ export default function SuperAdminDashboard() {
                     <p className="font-medium text-slate-900">{t.name}</p>
                     <p className="text-xs text-slate-500">{t.business_type || 'Sin tipo'}</p>
                   </div>
-                  <div className="text-right">
-                    <span className="inline-block px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-medium mb-1">
-                      {t.status}
-                    </span>
+                  <div className="text-right flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block px-2 py-0.5 bg-red-100 text-red-700 rounded-md text-xs font-semibold">
+                        {t.status}
+                      </span>
+                      <button
+                        onClick={() => setReactivatingTenant(t)}
+                        className="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs"
+                        title="Reactivar y elegir plan"
+                      >
+                        <Power className="w-3.5 h-3.5" />
+                        <span>Reactivar</span>
+                      </button>
+                    </div>
                     <p className="text-xs text-slate-400">{new Date(t.created_at).toLocaleDateString()}</p>
                   </div>
                 </li>
@@ -249,6 +255,13 @@ export default function SuperAdminDashboard() {
         </div>
       </section>
 
+      {/* Modal de Reactivación con Selección de Plan */}
+      <ReactivateTenantModal
+        tenant={reactivatingTenant}
+        isOpen={Boolean(reactivatingTenant)}
+        onClose={() => setReactivatingTenant(null)}
+        onSuccess={handleReactivateSuccess}
+      />
     </div>
   );
 }

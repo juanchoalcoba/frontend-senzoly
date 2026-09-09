@@ -2,18 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { 
   getSuperAdminTenants,
   suspendSuperAdminTenant,
-  reactivateSuperAdminTenant,
   deleteSuperAdminTenant,
   getSuperAdminTenant
 } from '../../auth/services/authApi';
-import { Search, Filter, Eye, Power, PowerOff, Trash2 } from 'lucide-react';
+import { Search, Filter, Eye, Power, PowerOff, Trash2, CheckCircle2 } from 'lucide-react';
+import ReactivateTenantModal from '../components/ReactivateTenantModal';
 
 export default function SuperAdminCompanies() {
   const token = localStorage.getItem('token');
   const [tenants, setTenants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTenant, setSelectedTenant] = useState(null);
+  const [reactivatingTenant, setReactivatingTenant] = useState(null);
   const [actionError, setActionError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchTenants = async () => {
@@ -39,29 +41,48 @@ export default function SuperAdminCompanies() {
   };
 
   const changeTenantStatus = async (tenant, action) => {
-    const labels = { suspend: 'suspender', reactivate: 'reactivar', delete: 'eliminar' };
+    if (action === 'reactivate') {
+      setActionError('');
+      setSuccessMessage('');
+      setReactivatingTenant(tenant);
+      return;
+    }
+
+    const labels = { suspend: 'suspender', delete: 'eliminar' };
     if (!window.confirm(`¿Confirmas que deseas ${labels[action]} ${tenant.name}?`)) return;
 
     try {
       setActionError('');
+      setSuccessMessage('');
       const operations = {
         suspend: suspendSuperAdminTenant,
-        reactivate: reactivateSuperAdminTenant,
         delete: deleteSuperAdminTenant,
       };
       const updated = await operations[action](token, tenant.id);
       if (action === 'delete') {
         setTenants((current) => current.filter((item) => item.id !== tenant.id));
         setSelectedTenant(null);
+        setSuccessMessage(`Empresa ${tenant.name} eliminada correctamente.`);
         return;
       }
       setTenants((current) => current.map((item) => (
         item.id === tenant.id ? { ...item, ...updated } : item
       )));
       setSelectedTenant((current) => current?.id === tenant.id ? { ...current, ...updated } : current);
+      setSuccessMessage(`Empresa ${tenant.name} suspendida correctamente.`);
     } catch (error) {
       setActionError(error.message);
     }
+  };
+
+  const handleReactivateSuccess = (updatedTenant) => {
+    setTenants((current) => current.map((item) => (
+      item.id === updatedTenant.id ? { ...item, ...updatedTenant } : item
+    )));
+    if (selectedTenant?.id === updatedTenant.id) {
+      setSelectedTenant(updatedTenant);
+    }
+    setSuccessMessage(`Empresa ${updatedTenant.name} reactivada con éxito en el plan ${updatedTenant.plan_name || 'seleccionado'}.`);
   };
 
   if (isLoading) {
@@ -78,6 +99,21 @@ export default function SuperAdminCompanies() {
         <h1 className="text-2xl font-bold text-slate-900">Directorio de Empresas</h1>
         <p className="text-slate-500">Gestión de todos los tenants registrados en Senzoly.</p>
       </div>
+
+      {successMessage && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>{successMessage}</span>
+          </div>
+          <button
+            onClick={() => setSuccessMessage('')}
+            className="text-emerald-700 hover:text-emerald-950 font-medium text-xs ml-4"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
 
       {actionError && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -153,8 +189,12 @@ export default function SuperAdminCompanies() {
                       </button>
                       <button
                         onClick={() => changeTenantStatus(tenant, tenant.status === 'suspended' ? 'reactivate' : 'suspend')}
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title={tenant.status === 'suspended' ? 'Reactivar' : 'Suspender'}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          tenant.status === 'suspended'
+                            ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
+                            : 'text-slate-400 hover:text-red-600 hover:bg-red-50'
+                        }`}
+                        title={tenant.status === 'suspended' ? 'Reactivar y elegir plan' : 'Suspender'}
                       >
                         {tenant.status === 'suspended' ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
                       </button>
@@ -178,6 +218,7 @@ export default function SuperAdminCompanies() {
         </div>
       </section>
 
+      {/* Modal de Detalle de Empresa */}
       {selectedTenant && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4" onClick={() => setSelectedTenant(null)}>
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl" onClick={(event) => event.stopPropagation()}>
@@ -197,9 +238,32 @@ export default function SuperAdminCompanies() {
               <div><dt className="text-slate-500">Clientes</dt><dd className="font-medium">{selectedTenant.customers_count}</dd></div>
               <div className="col-span-2"><dt className="text-slate-500">Último acceso</dt><dd className="font-medium">{selectedTenant.last_login_at ? new Date(selectedTenant.last_login_at).toLocaleString() : 'Sin accesos registrados'}</dd></div>
             </dl>
+
+            {selectedTenant.status === 'suspended' && (
+              <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReactivatingTenant(selectedTenant);
+                  }}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm transition-all"
+                >
+                  <Power className="w-4 h-4" />
+                  <span>Reactivar con Selección de Plan</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
+
+      {/* Modal de Reactivación con Selección de los 3 Planes */}
+      <ReactivateTenantModal
+        tenant={reactivatingTenant}
+        isOpen={Boolean(reactivatingTenant)}
+        onClose={() => setReactivatingTenant(null)}
+        onSuccess={handleReactivateSuccess}
+      />
     </div>
   );
 }

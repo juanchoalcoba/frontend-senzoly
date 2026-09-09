@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getSuperAdminSubscriptions } from '../../auth/services/authApi';
 import {
   CreditCard,
@@ -14,7 +14,10 @@ import {
   ExternalLink,
   Loader2,
   Banknote,
+  Power,
+  CheckCircle2,
 } from 'lucide-react';
+import ReactivateTenantModal from '../components/ReactivateTenantModal';
 
 const statusConfig = {
   ACTIVE: { label: 'Activa', color: 'bg-emerald-100 text-emerald-800', dot: 'bg-emerald-500' },
@@ -59,20 +62,28 @@ export default function SuperAdminSubscriptions() {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('subscriptions');
   const [expandedRow, setExpandedRow] = useState(null);
+  const [reactivatingTenant, setReactivatingTenant] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const loadData = useCallback(async () => {
+    try {
+      const result = await getSuperAdminSubscriptions(token);
+      setData(result);
+    } catch (err) {
+      setError(err.message || 'Error al cargar datos de suscripciones');
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const result = await getSuperAdminSubscriptions(token);
-        setData(result);
-      } catch (err) {
-        setError(err.message || 'Error al cargar datos de suscripciones');
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (token) load();
-  }, [token]);
+    if (token) loadData();
+  }, [token, loadData]);
+
+  const handleReactivateSuccess = (updatedTenant) => {
+    setSuccessMessage(`Empresa ${updatedTenant.name} reactivada exitosamente con el plan ${updatedTenant.plan_name || ''}.`);
+    loadData();
+  };
 
   if (loading) {
     return (
@@ -95,6 +106,21 @@ export default function SuperAdminSubscriptions() {
           Métricas de ingresos, estado de suscripciones y pagos de todos los tenants.
         </p>
       </div>
+
+      {successMessage && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>{successMessage}</span>
+          </div>
+          <button
+            onClick={() => setSuccessMessage('')}
+            className="text-emerald-700 hover:text-emerald-950 font-medium text-xs ml-4"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-center gap-2">
@@ -230,12 +256,30 @@ export default function SuperAdminSubscriptions() {
                           <td className="py-3.5 px-4 text-slate-600">{formatDate(sub.last_payment_date)}</td>
                           <td className="py-3.5 px-4 text-right font-bold text-slate-900">{formatCurrency(sub.total_paid)}</td>
                           <td className="py-3.5 px-4 text-right">
-                            <button
-                              onClick={() => setExpandedRow(isExpanded ? null : sub.tenant_id)}
-                              className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
-                            >
-                              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              {(sub.tenant_status === 'suspended' || sub.subscription_status?.toLowerCase() === 'suspended') && (
+                                <button
+                                  onClick={() => setReactivatingTenant({
+                                    id: sub.tenant_id,
+                                    name: sub.tenant_name,
+                                    slug: sub.tenant_slug,
+                                    plan_name: sub.plan_name,
+                                    plan_id: sub.plan_id
+                                  })}
+                                  className="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs"
+                                  title="Reactivar empresa con elección de plan"
+                                >
+                                  <Power className="w-3.5 h-3.5" />
+                                  <span>Reactivar</span>
+                                </button>
+                              )}
+                              <button
+                                onClick={() => setExpandedRow(isExpanded ? null : sub.tenant_id)}
+                                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                              >
+                                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                         {isExpanded && (
@@ -325,6 +369,14 @@ export default function SuperAdminSubscriptions() {
           </div>
         )}
       </div>
+
+      {/* Modal de Reactivación con Selección de Plan */}
+      <ReactivateTenantModal
+        tenant={reactivatingTenant}
+        isOpen={Boolean(reactivatingTenant)}
+        onClose={() => setReactivatingTenant(null)}
+        onSuccess={handleReactivateSuccess}
+      />
     </div>
   );
 }

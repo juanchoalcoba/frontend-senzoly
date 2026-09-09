@@ -121,9 +121,14 @@ export const suspendSuperAdminTenant = async (token, tenantId) => {
   return data.data;
 };
 
-export const reactivateSuperAdminTenant = async (token, tenantId) => {
+export const reactivateSuperAdminTenant = async (token, tenantId, payload = {}) => {
   const res = await fetch(`${API_URL}/super-admin/tenants/${tenantId}/reactivate`, {
-    method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` },
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
   });
   const data = await res.json();
   if (!data.success) throw createApiError(data, 'Error al reactivar empresa');
