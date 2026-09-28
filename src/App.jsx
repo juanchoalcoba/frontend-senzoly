@@ -44,6 +44,8 @@ import SuperAdminProtectedRoute from './components/SuperAdminProtectedRoute';
 
 
 import { onForegroundMessage } from './config/firebase';
+import { checkIsMaintenanceActive } from './config/maintenanceConfig';
+import MaintenancePage from './pages/MaintenancePage';
 
 function App() {
   useEffect(() => {
@@ -52,6 +54,11 @@ function App() {
       if (unsubscribe) unsubscribe();
     };
   }, []);
+
+  // Si el modo mantenimiento global está activo, pausar toda la web
+  if (checkIsMaintenanceActive()) {
+    return <MaintenancePage />;
+  }
 
   return (
     <AuthProvider>
