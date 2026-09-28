@@ -46,6 +46,7 @@ import SuperAdminProtectedRoute from './components/SuperAdminProtectedRoute';
 import { onForegroundMessage } from './config/firebase';
 import { checkIsMaintenanceActive } from './config/maintenanceConfig';
 import MaintenancePage from './pages/MaintenancePage';
+import AdminMaintenanceBanner from './components/AdminMaintenanceBanner';
 
 function App() {
   useEffect(() => {
@@ -180,6 +181,7 @@ function App() {
           </Route>
 
         </Routes>
+        <AdminMaintenanceBanner />
         </ThemeProvider>
       </BrowserRouter>
     </AuthProvider>

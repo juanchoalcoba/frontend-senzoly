@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { 
   ShieldCheck, 
-  Sparkles, 
   Clock, 
   RefreshCw, 
   Mail, 
   Lock, 
-  CheckCircle2, 
   AlertTriangle 
 } from 'lucide-react';
 import { MAINTENANCE_CONFIG } from '../config/maintenanceConfig';
@@ -60,7 +58,7 @@ export default function MaintenancePage() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
           </span>
-          <span>Mantenimiento en curso</span>
+          <span>Servicio Suspendido</span>
         </div>
       </header>
 
@@ -69,13 +67,13 @@ export default function MaintenancePage() {
         
         {/* Badge sutil */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-slate-300 text-xs font-medium mb-6 shadow-inner">
-          <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
           <span>{MAINTENANCE_CONFIG.badge}</span>
         </div>
 
         {/* Título Principal */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-          Estamos optimizando la plataforma
+          Plataforma Temporalmente Suspendida
         </h1>
 
         {/* Párrafo explicativo suave y tranquilizador */}
@@ -92,31 +90,31 @@ export default function MaintenancePage() {
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Datos Seguros</h2>
+                <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Datos Resguardados</h2>
                 <p className="text-xs text-slate-400 mt-1 leading-normal">
-                  Todas tus reservas, clientes y registros permanecen 100% protegidos y respaldados.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/40">
-              <div className="p-2 rounded-lg bg-orange-500/10 text-orange-400 shrink-0">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Actualizaciones</h2>
-                <p className="text-xs text-slate-400 mt-1 leading-normal">
-                  Optimizando servidores y tiempos de respuesta para mejorar la experiencia.
+                  {MAINTENANCE_CONFIG.reassurance}
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/40">
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Alcance Global</h2>
+                <p className="text-xs text-slate-400 mt-1 leading-normal">
+                  La suspensión aplica tanto al portal público de reservas como a los paneles de administración.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-950/40 border border-slate-800/40">
+              <div className="p-2 rounded-lg bg-slate-800 text-slate-300 shrink-0">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Regreso Pronto</h2>
+                <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">Estado</h2>
                 <p className="text-xs text-slate-400 mt-1 leading-normal">
                   {MAINTENANCE_CONFIG.estimatedTime}
                 </p>

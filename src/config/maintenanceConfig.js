@@ -24,13 +24,13 @@ export const MAINTENANCE_CONFIG = {
   bypassKey: 'admin2026',
 
   // Información visual mostrada en la pantalla
-  badge: 'Mantenimiento Preventivo Programado',
-  title: 'Plataforma en Mantenimiento',
+  badge: 'Servicio Suspendido por Mantenimiento',
+  title: 'Plataforma Temporalmente Suspendida',
   subtitle:
-    'Estamos realizando labores técnicas de actualización y optimización de infraestructura tanto en el portal público como en las plataformas de administración.',
+    'La web y sus servicios se encuentran actualmente suspendidos por tareas de mantenimiento, abarcando tanto el acceso público como los paneles de administración.',
   reassurance:
-    'Toda la información, reservas, registros y configuraciones se encuentran totalmente resguardados y seguros.',
-  estimatedTime: 'Volveremos a estar disponibles y 100% operativos a la brevedad.',
+    'Toda la información y registros del sistema permanecen debidamente resguardados.',
+  estimatedTime: 'El acceso a la plataforma volverá a estar disponible a la brevedad.',
   contactEmail: 'soporte@senzoly.com',
 };
 
@@ -70,6 +70,18 @@ export const checkIsMaintenanceActive = () => {
   }
 
   return true;
+};
+
+/**
+ * Indica si el usuario actual está navegando usando el bypass administrativo
+ */
+export const isBypassActive = () => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return sessionStorage.getItem('senzoly_maintenance_bypass') === 'true';
+  } catch {
+    return false;
+  }
 };
 
 /**
